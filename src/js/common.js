@@ -11,6 +11,27 @@ export const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)
 export const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
 export let lenis = null;
 
+// sessionStorage peut être bloqué (navigation privée, cookies refusés) : on ne plante jamais pour ça.
+export const session = {
+  get: (k) => {
+    try {
+      return sessionStorage.getItem(k);
+    } catch {
+      return null;
+    }
+  },
+  set: (k, v) => {
+    try {
+      sessionStorage.setItem(k, v);
+    } catch {}
+  },
+  remove: (k) => {
+    try {
+      sessionStorage.removeItem(k);
+    } catch {}
+  },
+};
+
 function initScroll() {
   if (reducedMotion) return;
   lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 0.9 });
@@ -171,8 +192,8 @@ function initMagnetic() {
 function initTransitions() {
   const curtain = document.querySelector('.curtain');
   if (!curtain) return;
-  if (sessionStorage.getItem('ig-curtain')) {
-    sessionStorage.removeItem('ig-curtain');
+  if (session.get('ig-curtain')) {
+    session.remove('ig-curtain');
     gsap.set(curtain, { yPercent: 0 });
     gsap.to(curtain, { yPercent: -100, duration: 1, ease: 'expo.inOut', delay: 0.05 });
   }
@@ -183,7 +204,7 @@ function initTransitions() {
     const url = new URL(a.href, location.href);
     if (url.origin !== location.origin || url.pathname === location.pathname) return;
     e.preventDefault();
-    sessionStorage.setItem('ig-curtain', '1');
+    session.set('ig-curtain', '1');
     gsap.fromTo(curtain, { yPercent: 100 }, { yPercent: 0, duration: 0.7, ease: 'expo.inOut', onComplete: () => (location.href = url.href) });
   });
   // Retour arrière depuis le cache : on retire le rideau

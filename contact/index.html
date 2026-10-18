@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <script>document.documentElement.classList.add('js')</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#4c1212" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Pinyon+Script&family=Tenor+Sans&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/css/main.css" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://linstantg.com/img/gateau-velours-violet.jpg" />
+    <title>Contact — L’instant Gourmand · La Garenne-Colombes</title>
+    <meta name="description" content="Contactez L’instant Gourmand : WhatsApp et téléphone +33 6 59 15 00 66, contact@linstantg.com. Atelier à La Garenne-Colombes (92250), retrait sur commande." />
+    <link rel="canonical" href="https://linstantg.com/contact/" />
+    <meta property="og:title" content="Contact — L’instant Gourmand" />
+  </head>
+  <body data-page="contact">
+    <!--@header-->
+    <main id="main">
+      <section class="page-hero" data-header-theme="dark">
+        <div class="page-hero__mono" aria-hidden="true"><!--@monogram--></div>
+        <div class="wrap" style="position: relative">
+          <p class="eyebrow">Restons en contact</p>
+          <h1 class="display h1" data-split>Parlons de votre <span class="script">projet</span></h1>
+          <p class="lead reveal-up">— ou simplement de pâtisserie. Une question, un projet, une envie de gourmandise : Jihene vous répond personnellement, dans les 24 heures.</p>
+        </div>
+      </section>
+
+      <section class="section" data-header-theme="light">
+        <div class="wrap channels"><!--@channels--></div>
+      </section>
+
+      <section class="section section--soft" data-header-theme="light">
+        <div class="wrap order">
+          <aside class="order__aside">
+            <p class="eyebrow" style="color: var(--cacao)">Le formulaire</p>
+            <h2 class="display h2" data-split>Écrivez-nous</h2>
+            <p class="muted reveal-up" style="margin-top: 24px">Pour les questions générales, les demandes presse ou les partenariats. Pour passer commande, préférez la <a class="link-line" href="/commander/">page Commander</a>.</p>
+          </aside>
+          <form class="form contact-form" novalidate>
+            <div class="field"><label for="c-first">Prénom *</label><input id="c-first" name="prenom" autocomplete="given-name" required /></div>
+            <div class="field"><label for="c-last">Nom *</label><input id="c-last" name="nom" autocomplete="family-name" required /></div>
+            <div class="field"><label for="c-email">E-mail *</label><input id="c-email" name="email" type="email" autocomplete="email" required /></div>
+            <div class="field"><label for="c-phone">Téléphone</label><input id="c-phone" name="telephone" type="tel" autocomplete="tel" /></div>
+            <div class="field field--full">
+              <label for="c-subject">Sujet *</label>
+              <select id="c-subject" name="sujet" required>
+                <option value="">Choisissez un sujet</option>
+                <option>Question générale</option>
+                <option>Demande de devis personnalisé</option>
+                <option>Projet professionnel / cadeaux d’entreprise</option>
+                <option>Demande presse / partenariat</option>
+                <option>Allergies et compositions</option>
+                <option>Autre</option>
+              </select>
+            </div>
+            <div class="field field--full"><label for="c-msg">Votre message *</label><textarea id="c-msg" name="message" required placeholder="Votre projet, votre question, votre envie…"></textarea></div>
+            <div class="form__actions">
+              <button class="btn btn--wa" type="submit" data-magnetic>Envoyer via WhatsApp <svg class="btn__arrow" viewBox="0 0 16 10" fill="none" stroke="currentColor" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg></button>
+              <button class="btn btn--ghost" type="button" data-email>Envoyer par e-mail</button>
+            </div>
+            <p class="form__note" role="status" aria-live="polite">Votre message s’ouvre pré-rempli dans WhatsApp : il ne reste qu’à appuyer sur envoyer.</p>
+          </form>
+        </div>
+      </section>
+
+      <section class="atelier-map" data-header-theme="light">
+        <div class="atelier-map__info">
+          <p class="eyebrow" style="color: var(--cacao)">Notre atelier</p>
+          <h2 class="display h2" data-split>Au cœur de la <span class="script">région parisienne</span></h2>
+          <!--@atelierInfo-->
+        </div>
+        <div class="atelier-map__map">
+          <span class="atelier-map__label">L’atelier</span>
+          <iframe src="https://www.google.com/maps?q=La+Garenne-Colombes,92250&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="L’atelier L’instant Gourmand à La Garenne-Colombes"></iframe>
+        </div>
+      </section>
+
+      <section class="section" data-header-theme="light">
+        <div class="wrap">
+          <div class="section__head"><div><p class="eyebrow">Sur les réseaux</p><h2 class="display h2" data-split>Suivez nos <span class="script">créations</span></h2></div><p class="muted" style="max-width: 26em; margin: 0">Nouvelles créations en avant-première, coulisses de l’atelier et collections saisonnières.</p></div>
+          <div class="social-cards"><!--@socialCards--></div>
+        </div>
+      </section>
+    </main>
+    <!--@footer-->
+    <script type="module" src="/src/js/contact.js"></script>
+  </body>
+</html>

@@ -1,10 +1,27 @@
 # L’instant Gourmand — linstantg.com
 
-Site vitrine 3D de la pâtisserie **L’instant Gourmand** (Douceur & Saveur).
+Site vitrine 3D de **L’instant Gourmand** — pâtisserie franco-tunisienne sur commande de Jihene Chaieb, La Garenne-Colombes (92).
 
-- **Accueil** : gâteau velours en 3D temps réel (Three.js) qui tourne, se découpe et s’éclate couche par couche au scroll, vitrine horizontale, atelier, étapes de commande.
-- **Créations** : galerie filtrable par catégorie (gâteaux personnalisés, entremets, gâteaux coffret, bento, sucré, salé) avec visionneuse.
-- **Commander** : formulaire qui prépare la demande par e-mail (et WhatsApp si un numéro est renseigné).
+| Page | URL |
+| --- | --- |
+| Accueil : gâteau 3D (Three.js) qui se découpe et s’éclate au scroll, catégories, vitrine, atelier, étapes | `/` |
+| Créations : galerie filtrable (personnalisés, trompe-l’œil & entremets, douceurs tunisiennes, coffrets, salé) | `/creations/` |
+| Commander : occasion, créations, date (48 h mini) et créneau, envoi par WhatsApp ou e-mail, FAQ | `/commander/` |
+| Contact : WhatsApp / téléphone / e-mail, formulaire, atelier et carte, réseaux | `/contact/` |
+
+L’ancienne URL `/atelier/` redirige vers la section « L’atelier » de l’accueil.
+
+## Mettre en ligne sur Vercel
+
+1. Pousser ce dépôt sur GitHub, puis sur vercel.com : **Add New → Project → importer le dépôt**. Vercel détecte Vite tout seul (réglages dans `vercel.json`).
+2. Dans le projet Vercel : **Settings → Domains → ajouter `linstantg.com` et `www.linstantg.com`**, puis recopier chez le registrar du domaine les enregistrements DNS indiqués par Vercel.
+3. **Avant de changer les DNS**, récupérer les photos de l’ancien site WordPress (elles disparaîtront ensuite) :
+
+   ```bash
+   npm install
+   npm run photos:wordpress   # télécharge les 15 photos de l’ancien site et les optimise dans public/img/
+   git add public/img && git commit -m "Photos de l’ancien site" && git push
+   ```
 
 ## Lancer le site
 
@@ -14,19 +31,22 @@ npm run dev      # http://localhost:5173
 npm run build    # version en ligne dans dist/
 ```
 
-Le dossier `dist/` est un site statique : il s’héberge partout (Netlify, Vercel, Cloudflare Pages, OVH, o2switch…). Il suffit d’y pointer le domaine `linstantg.com`.
+Le dossier `dist/` est un site statique : il s’héberge partout (Vercel, Netlify, OVH…).
 
 ## Modifier le contenu
 
 | Quoi | Où |
 | --- | --- |
-| E-mail, téléphone, WhatsApp, Instagram, zone | `src/js/config.js` (`CONTACT`) |
+| Téléphone, WhatsApp, e-mail, Instagram, Facebook, ville, horaires, délai | `src/js/config.js` (`CONTACT`) |
 | Catégories du menu « Créations » | `src/js/config.js` (`CATEGORIES`) |
+| Occasions et FAQ de la page Commander | `src/js/config.js` (`OCCASIONS`, `FAQ`) |
 | Gâteaux affichés (titre, catégorie, description, photo) | `src/js/data.js` |
 | Photos | `public/img/` (`nom-800.webp` et `nom-1400.webp`) |
 | Couleurs, typographies | haut de `src/css/main.css` |
 
-**Ajouter un gâteau** : déposer `public/img/mon-gateau-800.webp` et `public/img/mon-gateau-1400.webp`, puis ajouter une entrée dans `src/js/data.js` avec `image: 'mon-gateau'`. Il apparaît automatiquement dans la galerie, la vitrine et le menu. Une catégorie sans photo affiche « Photos à venir ».
+**Ajouter une photo** : déposer l’original dans `photos/` en le nommant comme le champ `image` de `src/js/data.js` (ex. `photos/trompe-loeil-cafe.jpg`), puis `npm run photos`. Tant qu’une création n’a pas de photo, elle s’affiche avec le monogramme et « Photos à venir ».
+
+**Ajouter une création** : ajouter une entrée dans `src/js/data.js` (titre, catégorie, étiquette, description, nom de photo). Elle apparaît automatiquement dans la galerie, le formulaire de commande, et — si elle a une photo — dans la vitrine de l’accueil et l’aperçu du menu.
 
 ## Technique
 

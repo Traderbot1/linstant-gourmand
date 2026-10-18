@@ -26,8 +26,9 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
-        creations: resolve(import.meta.dirname, 'creations.html'),
-        commander: resolve(import.meta.dirname, 'commander.html'),
+        creations: resolve(import.meta.dirname, 'creations/index.html'),
+        commander: resolve(import.meta.dirname, 'commander/index.html'),
+        contact: resolve(import.meta.dirname, 'contact/index.html'),
       },
     },
   },

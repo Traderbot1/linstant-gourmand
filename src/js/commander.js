@@ -1,74 +1,72 @@
 import { initCommon } from './common.js';
-import { CATEGORIES, CONTACT } from './config.js';
+import { CONTACT } from './config.js';
+import { checkRequired, openEmail, openWhatsApp } from './send.js';
 
 initCommon();
 
-const form = document.querySelector('.form');
+const form = document.querySelector('.order-form');
 const note = form.querySelector('.form__note');
-const wa = form.querySelector('[data-whatsapp]');
 const params = new URLSearchParams(location.search);
 
-// Pré-remplissage depuis la galerie (?categorie=…&modele=…)
-const preCat = params.get('categorie');
-if (preCat) {
-  const radio = form.querySelector(`input[name="categorie"][value="${CSS.escape(preCat)}"]`);
-  if (radio) radio.checked = true;
+// Pré-sélection depuis la galerie (?creation=id)
+const pre = params.get('creation');
+if (pre) {
+  const box = form.querySelector(`input[name="creations"][data-id="${CSS.escape(pre)}"]`);
+  if (box) box.checked = true;
 }
-if (params.get('modele')) form.modele.value = params.get('modele');
 
-// Pas de date passée
-const today = new Date();
-today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-form.date.min = today.toISOString().slice(0, 10);
+// Date minimum : maintenant + délai de préparation
+const min = new Date(Date.now() + CONTACT.minDelayHours * 3600 * 1000);
+const iso = (d) => new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 10);
+form.date.min = iso(min);
+
+const longDate = (v) => new Date(`${v}T12:00`).toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+function valid() {
+  if (!checkRequired(form, note)) return false;
+  if (form.date.value < form.date.min) {
+    form.date.focus();
+    note.textContent = `Le délai minimum de préparation est de ${CONTACT.minDelayHours} heures : merci de choisir une date à partir du ${longDate(form.date.min)}.`;
+    return false;
+  }
+  return true;
+}
 
 function message() {
   const d = new FormData(form);
-  const cat = CATEGORIES.find((c) => c.id === d.get('categorie'));
-  const date = d.get('date') ? new Date(`${d.get('date')}T12:00`).toLocaleDateString('fr-FR', { dateStyle: 'full' }) : '';
-  return [
-    'Bonjour L’instant Gourmand,',
+  const picks = d.getAll('creations');
+  const lines = [
+    '*Nouvelle demande de commande — L’instant Gourmand*',
     '',
-    'Je souhaite commander :',
-    `• Création : ${cat ? cat.title : ''}`,
-    `• Occasion : ${d.get('occasion')}`,
-    `• Date souhaitée : ${date}`,
-    d.get('parts') && `• Nombre de parts : ${d.get('parts')}`,
-    d.get('modele') && `• Modèle / inspiration : ${d.get('modele')}`,
+    `Bonjour ${CONTACT.chef.split(' ')[0]}, voici les détails de ma commande :`,
     '',
-    d.get('message'),
+    `👤 *Client* : ${d.get('prenom')} ${d.get('nom')}`,
+    `📞 *Téléphone* : ${d.get('telephone')}`,
+    d.get('email') && `✉️ *E-mail* : ${d.get('email')}`,
     '',
-    `${d.get('nom')}`,
-    d.get('email'),
-    d.get('telephone'),
-  ]
-    .filter((l) => l !== null && l !== undefined && l !== false)
-    .join('\n')
-    .replace(/\n{3,}/g, '\n\n');
-}
-
-function valid() {
-  for (const el of form.querySelectorAll('[required]')) {
-    if (!el.checkValidity()) {
-      el.focus();
-      note.textContent = `Merci de compléter le champ « ${form.querySelector(`label[for="${el.id}"]`).textContent} ».`;
-      return false;
-    }
-  }
-  return true;
+    `🎉 *Occasion* : ${d.get('occasion')}`,
+    picks.length ? `🍰 *Créations souhaitées* :\n${picks.map((p) => `   • ${p}`).join('\n')}` : '🍰 *Créations* : à définir ensemble',
+    d.get('details') && `📝 *Précisions* : ${d.get('details')}`,
+    '',
+    `📅 *Date* : ${longDate(d.get('date'))}`,
+    `⏰ *Créneau* : ${d.get('creneau')}`,
+    d.get('personnes') && `👥 *Personnes* : ${d.get('personnes')}`,
+    `📍 *Retrait* : atelier de ${CONTACT.city}`,
+    '',
+    'Merci d’avance, j’attends votre retour. 🌹',
+  ];
+  return lines.filter((l) => typeof l === 'string').join('\n').replace(/\n{3,}/g, '\n\n');
 }
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
   if (!valid()) return;
-  const subject = `Demande de création — ${form.nom.value}`;
-  location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(message())}`;
-  note.textContent = 'Votre messagerie s’ouvre avec la demande pré-remplie : il ne reste qu’à l’envoyer. Merci !';
+  openWhatsApp(message());
+  note.textContent = 'WhatsApp s’ouvre avec votre demande pré-remplie : il ne reste qu’à appuyer sur envoyer. Merci !';
 });
 
-if (CONTACT.whatsapp) {
-  wa.hidden = false;
-  wa.addEventListener('click', () => {
-    if (!valid()) return;
-    window.open(`https://wa.me/${CONTACT.whatsapp}?text=${encodeURIComponent(message())}`, '_blank', 'noopener');
-  });
-}
+form.querySelector('[data-email]').addEventListener('click', () => {
+  if (!valid()) return;
+  openEmail(`Demande de commande — ${form.prenom.value} ${form.nom.value}`, message());
+  note.textContent = 'Votre messagerie s’ouvre avec la demande pré-remplie. Merci !';
+});

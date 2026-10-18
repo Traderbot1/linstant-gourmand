@@ -1,4 +1,4 @@
-import { initCommon, gsap, ScrollTrigger, reducedMotion, isTouch, lenis } from './common.js';
+import { initCommon, gsap, ScrollTrigger, reducedMotion, isTouch, lenis, session } from './common.js';
 import { createCakeScene, LAYERS, ROT_REVEAL } from './cake-scene.js';
 
 initCommon();
@@ -18,11 +18,11 @@ try {
 function runLoader() {
   const loader = document.querySelector('.loader');
   if (!loader) return Promise.resolve();
-  if (sessionStorage.getItem('ig-seen') || reducedMotion) {
+  if (session.get('ig-seen') || reducedMotion) {
     loader.remove();
     return Promise.resolve();
   }
-  sessionStorage.setItem('ig-seen', '1');
+  session.set('ig-seen', '1');
   lenis?.stop();
   const count = loader.querySelector('.loader__count');
   const n = { v: 0 };

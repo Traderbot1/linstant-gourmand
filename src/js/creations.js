@@ -50,19 +50,23 @@ applyFilter(location.hash.slice(1), false);
 // ─── Lightbox ───
 const lb = document.querySelector('.lightbox');
 const lbImg = lb.querySelector('.lightbox__media img');
+const lbMono = lb.querySelector('.lightbox__media .mono-tile');
 let current = 0;
 let lastFocus = null;
 const visible = () => CREATIONS.filter((c) => !grid.querySelector(`[data-id="${c.id}"]`).hidden);
 
 function fill(c) {
   const cat = CATEGORIES.find((k) => k.id === c.category);
-  lbImg.src = `/img/${c.image}-1400.webp`;
+  const image = grid.querySelector(`[data-id="${c.id}"]`).dataset.img;
+  lbImg.hidden = !image;
+  lbMono.hidden = !!image;
+  if (image) lbImg.src = `/img/${image}-1400.webp`;
   lbImg.alt = c.title;
   lb.querySelector('[data-lb-cat]').textContent = cat ? cat.title : '';
   lb.querySelector('#lb-title').textContent = c.title;
-  lb.querySelector('[data-lb-occ]').textContent = c.occasion;
+  lb.querySelector('[data-lb-occ]').textContent = c.tag;
   lb.querySelector('[data-lb-desc]').textContent = c.description;
-  lb.querySelector('[data-lb-order]').href = `/commander.html?categorie=${c.category}&modele=${encodeURIComponent(c.title)}`;
+  lb.querySelector('[data-lb-order]').href = `/commander/?creation=${encodeURIComponent(c.id)}`;
 }
 function open(id) {
   const list = visible();

@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <script>document.documentElement.classList.add('js')</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#4c1212" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Pinyon+Script&family=Tenor+Sans&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/css/main.css" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://linstantg.com/img/gateau-velours-violet.jpg" />
+    <title>Commander — L’instant Gourmand · Pâtisserie sur commande</title>
+    <meta name="description" content="Commandez votre gâteau, vos coffrets ou votre buffet salé chez L’instant Gourmand : décrivez votre projet, Jihene vous répond par WhatsApp sous 24 h. Retrait à La Garenne-Colombes, 48 h minimum." />
+    <link rel="canonical" href="https://linstantg.com/commander/" />
+    <meta property="og:title" content="Commander — L’instant Gourmand" />
+  </head>
+  <body data-page="commander">
+    <!--@header-->
+    <main id="main">
+      <section class="page-hero" data-header-theme="dark">
+        <div class="page-hero__mono" aria-hidden="true"><!--@monogram--></div>
+        <div class="wrap" style="position: relative">
+          <p class="eyebrow">Commander</p>
+          <h1 class="display h1" data-split>Composez votre <span class="script">instant</span></h1>
+          <p class="lead reveal-up">Quelques minutes suffisent pour nous transmettre votre projet. Jihene vous répond personnellement, dans les 24 heures.</p>
+          <!--@promises-->
+        </div>
+      </section>
+
+      <section class="section" data-header-theme="light">
+        <div class="wrap">
+          <form class="order-form" novalidate>
+            <fieldset class="order-step reveal-up">
+              <legend><span class="order-step__n">01</span><span class="display h3">Pour quelle <span class="script">occasion</span>&nbsp;?</span></legend>
+              <div class="choices"><!--@occasionChoices--></div>
+            </fieldset>
+
+            <fieldset class="order-step reveal-up">
+              <legend><span class="order-step__n">02</span><span class="display h3">Vos créations <span class="script">préférées</span></span></legend>
+              <p class="order-step__intro">Sélectionnez celles qui vous tentent. Aucun engagement : tout sera affiné avec Jihene. Vous ne savez pas encore&nbsp;? Passez à la suite et décrivez vos envies.</p>
+              <!--@productPicks-->
+              <div class="field field--full" style="margin-top: 30px"><label for="f-details">Précisions sur votre commande</label><textarea id="f-details" name="details" placeholder="Nombre de personnes, allergies, saveurs préférées, thème, couleurs souhaitées…"></textarea></div>
+            </fieldset>
+
+            <fieldset class="order-step reveal-up">
+              <legend><span class="order-step__n">03</span><span class="display h3">Date &amp; <span class="script">retrait</span></span></legend>
+              <div class="form">
+                <div class="field"><label for="f-date">Date souhaitée *</label><input id="f-date" name="date" type="date" required /></div>
+                <div class="field">
+                  <label for="f-slot">Créneau préféré *</label>
+                  <select id="f-slot" name="creneau" required>
+                    <option value="">Choisissez un créneau</option>
+                    <option>Matin (9h – 12h)</option>
+                    <option>Après-midi (14h – 18h)</option>
+                    <option>Soir (18h – 20h)</option>
+                    <option>Pas de préférence</option>
+                  </select>
+                </div>
+                <div class="field"><label for="f-guests">Nombre approximatif de personnes</label><input id="f-guests" name="personnes" type="number" min="1" inputmode="numeric" placeholder="ex. 12" /></div>
+                <div class="notice field--full"><b>Retrait à l’atelier</b> Vos créations sont à retirer à l’atelier de La Garenne-Colombes (92250). L’adresse exacte et les modalités vous sont communiquées par Jihene après confirmation. Délai minimum : 48 h (5 à 7 jours pour le sur-mesure).</div>
+              </div>
+            </fieldset>
+
+            <fieldset class="order-step reveal-up">
+              <legend><span class="order-step__n">04</span><span class="display h3">Vos <span class="script">coordonnées</span></span></legend>
+              <div class="form">
+                <div class="field"><label for="f-first">Prénom *</label><input id="f-first" name="prenom" autocomplete="given-name" required /></div>
+                <div class="field"><label for="f-last">Nom *</label><input id="f-last" name="nom" autocomplete="family-name" required /></div>
+                <div class="field"><label for="f-phone">Téléphone (WhatsApp) *</label><input id="f-phone" name="telephone" type="tel" autocomplete="tel" required placeholder="06 XX XX XX XX" /></div>
+                <div class="field"><label for="f-email">E-mail</label><input id="f-email" name="email" type="email" autocomplete="email" placeholder="votre@email.com" /></div>
+              </div>
+            </fieldset>
+
+            <div class="form__actions">
+              <button class="btn btn--wa" type="submit" data-magnetic><span class="btn__icon" aria-hidden="true"></span>Envoyer via WhatsApp <svg class="btn__arrow" viewBox="0 0 16 10" fill="none" stroke="currentColor" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg></button>
+              <button class="btn btn--ghost" type="button" data-email>Envoyer par e-mail</button>
+            </div>
+            <p class="form__note" role="status" aria-live="polite">En validant, WhatsApp s’ouvre avec votre demande pré-remplie : il ne reste qu’à appuyer sur envoyer.</p>
+          </form>
+        </div>
+      </section>
+
+      <section class="section section--dark" data-header-theme="dark">
+        <div class="wrap faq">
+          <div class="section__head"><div><p class="eyebrow">Vos questions</p><h2 class="display h2" data-split>Tout ce qu’il faut savoir</h2></div></div>
+          <div class="faq__list"><!--@faq--></div>
+        </div>
+      </section>
+
+      <section class="section cta" data-header-theme="light">
+        <div class="wrap">
+          <p class="eyebrow" style="color: var(--cacao)">Une question&nbsp;?</p>
+          <h2 class="display h2" data-split>Jihene répond <span class="script">directement</span></h2>
+          <p class="lead" style="margin: -10px auto 40px; opacity: .8">Avant ou pendant votre commande, n’hésitez pas. Une réponse personnelle, en moins de 24 heures.</p>
+          <div class="cta__ctas">
+            <a class="btn" href="https://wa.me/33659150066" target="_blank" rel="noopener" data-magnetic>WhatsApp direct <svg class="btn__arrow" viewBox="0 0 16 10" fill="none" stroke="currentColor" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg></a>
+            <a class="btn btn--ghost" href="tel:+33659150066" data-magnetic>06 59 15 00 66</a>
+            <a class="btn btn--ghost" href="mailto:contact@linstantg.com" data-magnetic>E-mail</a>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!--@footer-->
+    <script type="module" src="/src/js/commander.js"></script>
+  </body>
+</html>

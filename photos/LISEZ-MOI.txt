@@ -1,0 +1,4 @@
+Déposez ici les photos originales (jpg, png, webp…), nommées comme le champ `image` de src/js/data.js.
+Exemple : trompe-loeil-cafe.jpg
+Puis lancez : npm run photos
+Les versions optimisées sont créées dans public/img/ (ce sont elles qui sont publiées).
