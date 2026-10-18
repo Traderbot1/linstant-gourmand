@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <script>document.documentElement.classList.add('js')</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#4c1212" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Pinyon+Script&family=Tenor+Sans&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/css/main.css" />
+    <title>Commander — L’instant Gourmand</title>
+    <meta name="description" content="Commandez votre gâteau personnalisé chez L’instant Gourmand : décrivez votre occasion, vos envies et recevez votre devis." />
+    <link rel="canonical" href="https://linstantg.com/commander.html" />
+    <meta property="og:title" content="Commander — L’instant Gourmand" />
+    <meta property="og:image" content="https://linstantg.com/img/gateau-velours-violet.jpg" />
+  </head>
+  <body data-page="commander">
+    <!--@header-->
+    <main id="main">
+      <section class="page-hero" data-header-theme="dark">
+        <div class="page-hero__mono" aria-hidden="true"><!--@monogram--></div>
+        <div class="wrap" style="position: relative">
+          <p class="eyebrow">Commander</p>
+          <h1 class="display h1" data-split>Créons votre <span class="script">instant</span></h1>
+          <p class="lead reveal-up">Décrivez votre projet en quelques lignes : nous revenons vers vous avec une proposition et un devis.</p>
+        </div>
+      </section>
+
+      <section class="section" id="contact" data-header-theme="light">
+        <div class="wrap order">
+          <aside class="order__aside">
+            <p class="eyebrow" style="color: var(--cacao)">Contact</p>
+            <h2 class="display h2" data-split>Parlons gâteau</h2>
+            <p class="muted reveal-up" style="margin-top: 24px">Pour une pièce personnalisée, pensez à nous contacter le plus tôt possible : les agendas des grandes occasions se remplissent vite.</p>
+            <ul class="contact-list"><!--@contactList--></ul>
+          </aside>
+
+          <form class="form" novalidate>
+            <div class="field field--full">
+              <span class="field__label" style="font-size: 0.66rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--cacao)" id="cat-label">Type de création</span>
+              <div class="chips" role="radiogroup" aria-labelledby="cat-label"><!--@orderOptions--></div>
+            </div>
+            <div class="field"><label for="f-name">Nom &amp; prénom</label><input id="f-name" name="nom" autocomplete="name" required /></div>
+            <div class="field"><label for="f-email">E-mail</label><input id="f-email" name="email" type="email" autocomplete="email" required /></div>
+            <div class="field"><label for="f-phone">Téléphone</label><input id="f-phone" name="telephone" type="tel" autocomplete="tel" /></div>
+            <div class="field"><label for="f-date">Date souhaitée</label><input id="f-date" name="date" type="date" required /></div>
+            <div class="field">
+              <label for="f-occasion">Occasion</label>
+              <select id="f-occasion" name="occasion">
+                <option>Anniversaire</option>
+                <option>Fête des mères / des pères</option>
+                <option>Saint-Valentin</option>
+                <option>Baptême / naissance</option>
+                <option>Mariage / fiançailles</option>
+                <option>Événement d’entreprise</option>
+                <option>Autre</option>
+              </select>
+            </div>
+            <div class="field"><label for="f-parts">Nombre de parts</label><input id="f-parts" name="parts" type="number" min="1" inputmode="numeric" placeholder="ex. 12" /></div>
+            <div class="field field--full"><label for="f-model">Modèle ou inspiration</label><input id="f-model" name="modele" placeholder="ex. Velours Améthyste, couleurs, thème…" /></div>
+            <div class="field field--full"><label for="f-msg">Votre message</label><textarea id="f-msg" name="message" placeholder="Prénom à écrire, saveurs préférées, allergies…"></textarea></div>
+            <div class="form__actions">
+              <button class="btn" type="submit" data-magnetic>Envoyer ma demande <svg class="btn__arrow" viewBox="0 0 16 10" fill="none" stroke="currentColor" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg></button>
+              <button class="btn btn--ghost" type="button" data-whatsapp hidden>Envoyer sur WhatsApp</button>
+            </div>
+            <p class="form__note" role="status" aria-live="polite">Votre demande s’ouvre dans votre messagerie, prête à être envoyée.</p>
+          </form>
+        </div>
+      </section>
+    </main>
+    <!--@footer-->
+    <script type="module" src="/src/js/commander.js"></script>
+  </body>
+</html>

@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <script>document.documentElement.classList.add('js')</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>L’instant Gourmand — Pâtisserie artisanale · Douceur & Saveur</title>
+    <meta name="description" content="L’instant Gourmand : gâteaux personnalisés, entremets, gâteaux coffret, douceurs sucrées et salées, créés sur commande. Douceur & Saveur." />
+    <meta name="theme-color" content="#4c1212" />
+    <link rel="canonical" href="https://linstantg.com/" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="L’instant Gourmand — Douceur & Saveur" />
+    <meta property="og:description" content="Pâtisserie artisanale sur commande : gâteaux personnalisés, entremets, coffrets, sucré & salé." />
+    <meta property="og:url" content="https://linstantg.com/" />
+    <meta property="og:image" content="https://linstantg.com/img/gateau-velours-violet.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Pinyon+Script&family=Tenor+Sans&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/css/main.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Bakery",
+        "name": "L’instant Gourmand",
+        "slogan": "Douceur & Saveur",
+        "url": "https://linstantg.com/",
+        "image": "https://linstantg.com/img/gateau-velours-violet.jpg"
+      }
+    </script>
+  </head>
+  <body data-page="home">
+    <div class="loader" aria-hidden="true">
+      <div class="loader__mono"><!--@monogram--></div>
+      <span class="loader__tag">Douceur &amp; Saveur</span>
+      <span class="loader__count">0</span>
+    </div>
+    <!--@header-->
+
+    <canvas class="webgl" aria-hidden="true"></canvas>
+
+    <main id="main">
+      <!-- Héros + histoire 3D pilotée par le scroll -->
+      <div class="stage" data-header-theme="dark">
+        <section class="hero" aria-label="Accueil">
+          <h1 class="sr-only">L’instant Gourmand — Douceur &amp; Saveur, pâtisserie artisanale</h1>
+          <div class="hero__word" aria-hidden="true"><!--@wordmark--></div>
+          <img class="hero__fallback" src="/img/gateau-velours-violet-800.webp" alt="Gâteau velours lavande décoré de fleurs" />
+          <div class="hero__bottom">
+            <p class="hero__tag" data-hero-in><strong>Douceur &amp; Saveur</strong>Pâtisserie artisanale sur commande</p>
+            <div class="hero__ctas" data-hero-in>
+              <a class="btn btn--light" href="/creations.html" data-magnetic>Nos créations <svg class="btn__arrow" viewBox="0 0 16 10" fill="none" stroke="currentColor" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg></a>
+              <a class="btn btn--ghost" href="/commander.html" data-magnetic>Commander</a>
+            </div>
+          </div>
+          <div class="scroll-hint" aria-hidden="true">Défiler<i></i></div>
+        </section>
+
+        <section class="story" aria-label="Notre savoir-faire">
+          <div class="story__sticky">
+            <div class="story__step" data-step="0">
+              <p class="eyebrow">Le savoir-faire</p>
+              <h2 class="display h2">Chaque création naît d’un instant.</h2>
+              <p>Une idée, une émotion, une date à célébrer. Nous la traduisons en un gâteau unique, façonné à la main et pensé pour vous.</p>
+            </div>
+            <div class="story__step" data-step="1">
+              <p class="eyebrow">Sous le velours</p>
+              <h2 class="display h2">Un cœur qui se dévoile.</h2>
+              <p>Derrière la finition se cache l’essentiel : le goût. Biscuits moelleux, crèmes légères et inserts fruités, équilibrés avec soin.</p>
+            </div>
+            <div class="story__step" data-step="2">
+              <p class="eyebrow">Couche après couche</p>
+              <h2 class="display h2">L’art de l’équilibre.</h2>
+              <p>Chaque étage a son rôle : la tendreté, la fraîcheur, la gourmandise. Les saveurs se choisissent ensemble, selon vos envies.</p>
+            </div>
+            <div class="story__step" data-step="3">
+              <p class="eyebrow">Sur mesure</p>
+              <h2 class="display h2">Votre instant, <span class="script">notre signature.</span></h2>
+              <p>Anniversaire, fête des mères, Saint-Valentin ou simple envie : racontez-nous votre occasion.</p>
+              <a class="btn btn--light" href="/commander.html" data-magnetic>Imaginer mon gâteau <svg class="btn__arrow" viewBox="0 0 16 10" fill="none" stroke="currentColor" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg></a>
+            </div>
+            <div class="story__labels" aria-hidden="true"></div>
+            <div class="story__progress" aria-hidden="true"><span>01</span><b><i></i></b><span>04</span></div>
+          </div>
+        </section>
+      </div>
+
+      <!-- Manifeste + collections -->
+      <section class="section" id="collections" data-header-theme="light">
+        <div class="wrap">
+          <div class="manifesto">
+            <div class="manifesto__mono" data-draw><!--@monogram--></div>
+            <p class="manifesto__text" data-split>Des gâteaux qui se regardent d’abord, <em>puis</em> se savourent lentement.</p>
+          </div>
+          <div style="height: clamp(90px, 12vw, 180px)"></div>
+          <div class="section__head">
+            <div>
+              <p class="eyebrow">La carte</p>
+              <h2 class="display h2" data-split>Nos créations</h2>
+            </div>
+            <a class="btn btn--ghost" href="/creations.html" data-magnetic>Toute la galerie <svg class="btn__arrow" viewBox="0 0 16 10" fill="none" stroke="currentColor" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg></a>
+          </div>
+          <div class="cats"><!--@homeCats--></div>
+        </div>
+      </section>
+
+      <!-- Vitrine horizontale -->
+      <section class="showcase" aria-label="La vitrine" data-header-theme="dark">
+        <div class="showcase__pin">
+          <div class="showcase__head">
+            <div>
+              <p class="eyebrow">La vitrine</p>
+              <h2 class="display h2">Pièces <span class="script">signatures</span></h2>
+            </div>
+            <p class="muted" style="max-width: 26em; margin: 0">Velours, fleurs, or et couleurs : chaque gâteau raconte une histoire différente.</p>
+          </div>
+          <div class="showcase__track"><!--@showcase--></div>
+          <div class="showcase__bar"><i></i></div>
+        </div>
+      </section>
+
+      <!-- L'atelier -->
+      <section class="section" id="atelier" data-header-theme="light">
+        <div class="wrap atelier">
+          <div class="atelier__media">
+            <div class="atelier__img atelier__img--a" data-speed="-0.06"><img src="/img/gateau-bonne-fete-maman-800.webp" alt="Gâteau « Bonne fête maman » fleuri, perles dorées" loading="lazy" /></div>
+            <div class="atelier__img atelier__img--b" data-speed="0.08"><img src="/img/entremets-velours-36-800.webp" alt="Entremets velours blanc en forme de nuage" loading="lazy" /></div>
+            <div class="atelier__seal" aria-hidden="true">
+              <svg class="ring" viewBox="0 0 100 100"><defs><path id="circ" d="M50 50m-38 0a38 38 0 1 1 76 0a38 38 0 1 1-76 0" /></defs><text font-size="7.6" letter-spacing="3.2" fill="currentColor" font-family="Tenor Sans"><textPath href="#circ">FAIT MAIN · SUR COMMANDE · AVEC AMOUR ·</textPath></text></svg>
+              <div class="seal-mono"><!--@monogram--></div>
+            </div>
+          </div>
+          <div>
+            <p class="eyebrow" style="color: var(--cacao)">L’atelier</p>
+            <h2 class="display h2" data-split>Douceur <span class="script">&amp;</span> Saveur</h2>
+            <p class="lead reveal-up" style="margin-top: 30px">L’instant Gourmand, c’est une pâtisserie de création : des gâteaux imaginés pour un moment précis, avec l’exigence du beau et la promesse du bon.</p>
+            <ul class="values">
+              <li class="reveal-up"><i>01</i><div><b>Fait main</b><span>Chaque pièce est réalisée à la main, de la base aux finitions.</span></div></li>
+              <li class="reveal-up"><i>02</i><div><b>Sur mesure</b><span>Thème, couleurs, message, saveurs : tout se personnalise.</span></div></li>
+              <li class="reveal-up"><i>03</i><div><b>Sur commande</b><span>Préparé pour votre date, jamais à l’avance.</span></div></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Étapes -->
+      <section class="section section--dark" data-header-theme="dark">
+        <div class="wrap">
+          <div class="section__head">
+            <div>
+              <p class="eyebrow">Commander</p>
+              <h2 class="display h2" data-split>En trois temps</h2>
+            </div>
+          </div>
+          <div class="steps">
+            <article class="step reveal-up"><span class="step__n">01</span><div><h3>Imaginez</h3><p>Partagez l’occasion, la date, le nombre de parts et vos inspirations.</p></div></article>
+            <article class="step reveal-up"><span class="step__n">02</span><div><h3>Personnalisez</h3><p>Nous affinons ensemble le design et les saveurs, puis vous recevez votre devis.</p></div></article>
+            <article class="step reveal-up"><span class="step__n">03</span><div><h3>Savourez</h3><p>Votre création est prête le jour J. Il ne reste qu’à célébrer.</p></div></article>
+          </div>
+        </div>
+      </section>
+
+      <div class="marquee" aria-hidden="true">
+        <div class="marquee__track">
+          <span>Anniversaire <em>✦</em> Fête des mères <em>✦</em> Saint-Valentin <em>✦</em> Baptême <em>✦</em> Mariage <em>✦</em> Juste par envie <em>✦</em></span>
+          <span>Anniversaire <em>✦</em> Fête des mères <em>✦</em> Saint-Valentin <em>✦</em> Baptême <em>✦</em> Mariage <em>✦</em> Juste par envie <em>✦</em></span>
+        </div>
+      </div>
+
+      <section class="section cta" data-header-theme="light">
+        <div class="wrap">
+          <p class="eyebrow" style="color: var(--cacao)">Votre projet</p>
+          <h2 class="display h2" data-split>Une envie, une occasion&nbsp;? Créons votre instant.</h2>
+          <div class="cta__ctas">
+            <a class="btn" href="/commander.html" data-magnetic>Demander un devis <svg class="btn__arrow" viewBox="0 0 16 10" fill="none" stroke="currentColor" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg></a>
+            <a class="btn btn--ghost" href="/creations.html" data-magnetic>Voir les créations</a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!--@footer-->
+    <script type="module" src="/src/js/home.js"></script>
+  </body>
+</html>
