@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <script>document.documentElement.classList.add('js')</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#4c1212" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Pinyon+Script&family=Tenor+Sans&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/src/css/main.css" />
+    <title>{{TITLE}} — Nos créations · L’instant Gourmand</title>
+    <meta name="description" content="{{TEXT}} L’instant Gourmand, pâtisserie franco-tunisienne sur commande à La Garenne-Colombes." />
+    <link rel="canonical" href="https://linstantg.com/creations/{{ID}}/" />
+    <meta property="og:title" content="{{TITLE}} — L’instant Gourmand" />
+  </head>
+  <body data-page="creations" data-section="{{ID}}">
+    <!--@header-->
+    <main id="main">
+      <section class="page-hero" data-header-theme="dark">
+        <div class="page-hero__mono" aria-hidden="true"><!--@monogram--></div>
+        <div class="wrap" style="position: relative">
+          <p class="eyebrow"><a class="link-line" href="/creations/">Nos créations</a></p>
+          <h1 class="display h1" data-split><!--@sectionTitle:{{ID}}--></h1>
+          <p class="lead reveal-up"><!--@sectionText:{{ID}}--></p>
+        </div>
+      </section>
+
+      <section class="section" style="padding-top: 0" data-header-theme="light">
+        <div class="wrap">
+          <nav class="filters" aria-label="Sections"><!--@sectionNav:{{ID}}--></nav>
+          <div class="tagbar" role="toolbar" aria-label="Filtrer"><!--@tagFilters:{{ID}}--></div>
+          <div class="gallery"><!--@gallery:{{ID}}--></div>
+        </div>
+      </section>
+
+      <section class="section section--dark cta" data-header-theme="dark">
+        <div class="wrap">
+          <p class="eyebrow" style="color: var(--nude)">Sur mesure</p>
+          <h2 class="display h2" data-split>Vous avez une idée&nbsp;? <span class="script">Racontez-la nous.</span></h2>
+          <div class="cta__ctas"><a class="btn btn--light" href="/commander/" data-magnetic>Demander un devis <svg class="btn__arrow" viewBox="0 0 16 10" fill="none" stroke="currentColor" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg></a></div>
+        </div>
+      </section>
+    </main>
+
+    <div class="lightbox" role="dialog" aria-modal="true" aria-labelledby="lb-title" aria-hidden="true">
+      <div class="lightbox__panel" style="position: relative">
+        <button class="lightbox__close" type="button" aria-label="Fermer">×</button>
+        <div class="lightbox__media"><img alt="" /><div class="mono-tile" hidden><!--@monogram--></div></div>
+        <div class="lightbox__body">
+          <p class="eyebrow" data-lb-cat></p>
+          <h2 class="display h3" id="lb-title" style="font-size: clamp(2.2rem, 3.6vw, 3.4rem)"></h2>
+          <p data-lb-occ class="script" style="font-size: 1.8rem; opacity: 1"></p>
+          <p data-lb-desc></p>
+          <div><a class="btn" data-lb-order href="/commander/">Commander ce modèle <svg class="btn__arrow" viewBox="0 0 16 10" fill="none" stroke="currentColor" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg></a></div>
+          <div class="lightbox__nav"><button type="button" data-lb-prev aria-label="Création précédente">←</button><button type="button" data-lb-next aria-label="Création suivante">→</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!--@footer-->
+    <script type="module" src="/src/js/creations.js"></script>
+  </body>
+</html>

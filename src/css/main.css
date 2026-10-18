@@ -1078,11 +1078,13 @@ button {
   background: #fff;
 }
 .slide__frame img {
+  max-width: none;
   position: absolute;
-  inset: -6% -10%;
-  width: 120%;
-  height: 112%;
+  inset: -3% -6%;
+  width: 112%;
+  height: 106%;
   object-fit: cover;
+  object-position: 50% 35%;
 }
 .slide__meta {
   display: flex;
@@ -2429,4 +2431,22 @@ button {
 }
 .atelier-map__info .h2 {
   font-size: clamp(2.4rem, 4vw, 4.2rem);
+}
+
+/* Pages de section */
+.tagbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: -20px 0 clamp(30px, 4vw, 50px);
+}
+.tagbar:empty {
+  display: none;
+}
+.filters a.filter[aria-current='page'] {
+  background: var(--bordeaux-900);
+  color: var(--creme);
+}
+.page-hero .eyebrow a {
+  color: inherit;
 }

@@ -11,10 +11,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Pinyon+Script&family=Tenor+Sans&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/src/css/main.css" />
     <title>Nos créations — L’instant Gourmand</title>
-    <meta name="description" content="Galerie des créations de L’instant Gourmand : gâteaux personnalisés, trompe-l’œil, douceurs tunisiennes, coffrets et salé. Pâtisserie sur commande à La Garenne-Colombes." />
+    <meta name="description" content="Les créations de L’instant Gourmand : gâteaux, trompe-l’œil, douceurs tunisiennes, coffrets, salé et jus. Pâtisserie sur commande à La Garenne-Colombes." />
     <link rel="canonical" href="https://linstantg.com/creations/" />
     <meta property="og:title" content="Nos créations — L’instant Gourmand" />
-    <meta property="og:image" content="https://linstantg.com/img/gateau-velours-violet.jpg" />
   </head>
   <body data-page="creations">
     <!--@header-->
@@ -24,18 +23,13 @@
         <div class="wrap" style="position: relative">
           <p class="eyebrow">La galerie</p>
           <h1 class="display h1" data-split>Nos créations</h1>
-          <p class="lead reveal-up">Chaque pièce est unique, imaginée pour une personne, une date, une émotion. Laissez-vous inspirer, puis créons la vôtre.</p>
+          <p class="lead reveal-up">Chaque pièce est unique, imaginée pour une personne, une date, une émotion. Choisissez une section, laissez-vous inspirer, puis créons la vôtre.</p>
         </div>
       </section>
 
-      <section class="section" style="padding-top: 0" data-header-theme="light">
+      <section class="section" data-header-theme="light">
         <div class="wrap">
-          <div class="filters" role="toolbar" aria-label="Filtrer par catégorie"><!--@filters--></div>
-          <div class="cat-intro">
-            <h2 class="display h2" data-cat-title>Toutes les créations</h2>
-            <p data-cat-text>Gâteaux personnalisés, trompe-l’œil, douceurs tunisiennes, coffrets et salé : parcourez l’ensemble de nos créations.</p>
-          </div>
-          <div class="gallery"><!--@gallery--></div>
+          <div class="cats"><!--@homeCats--></div>
         </div>
       </section>
 
@@ -47,23 +41,7 @@
         </div>
       </section>
     </main>
-
-    <div class="lightbox" role="dialog" aria-modal="true" aria-labelledby="lb-title" aria-hidden="true">
-      <div class="lightbox__panel" style="position: relative">
-        <button class="lightbox__close" type="button" aria-label="Fermer">×</button>
-        <div class="lightbox__media"><img alt="" /><div class="mono-tile" hidden><!--@monogram--></div></div>
-        <div class="lightbox__body">
-          <p class="eyebrow" data-lb-cat></p>
-          <h2 class="display h3" id="lb-title" style="font-size: clamp(2.2rem, 3.6vw, 3.4rem)"></h2>
-          <p data-lb-occ class="script" style="font-size: 1.8rem; opacity: 1"></p>
-          <p data-lb-desc></p>
-          <div><a class="btn" data-lb-order href="/commander/">Commander ce modèle <svg class="btn__arrow" viewBox="0 0 16 10" fill="none" stroke="currentColor" aria-hidden="true"><path d="M0 5h15M11 1l4 4-4 4"/></svg></a></div>
-          <div class="lightbox__nav"><button type="button" data-lb-prev aria-label="Création précédente">←</button><button type="button" data-lb-next aria-label="Création suivante">→</button></div>
-        </div>
-      </div>
-    </div>
-
     <!--@footer-->
-    <script type="module" src="/src/js/creations.js"></script>
+    <script type="module" src="/src/js/page.js"></script>
   </body>
 </html>

@@ -38,13 +38,17 @@ export function img(name, alt, sizes = '(max-width: 760px) 90vw, 33vw', extra = 
 const monoTile = (soon = false) => `<div class="mono-tile${soon ? ' mono-tile--soon' : ''}" aria-hidden="true">${svg('monogram')}</div>`;
 const media = (c, sizes) => (hasImage(c.image) ? img(c.image, c.title, sizes) : monoTile(true));
 const withImages = () => CREATIONS.filter((c) => hasImage(c.image));
-const coverOf = (catId) => withImages().find((c) => c.category === catId);
+const coverOf = (catId) => {
+  const list = withImages().filter((c) => c.category === catId);
+  return list.find((c) => c.featured) ?? list[0];
+};
+const slug = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
 const countOf = (catId) => CREATIONS.filter((c) => c.category === catId).length;
 
 export function header() {
   const items = CATEGORIES.map(
     (c, i) =>
-      `<li><a href="/creations/#${c.id}" data-preview="${i}"><span class="mega__num">${pad(i + 1)}</span><span class="mega__title">${c.title}</span><span class="mega__sub">${c.short}</span></a></li>`,
+      `<li><a href="/creations/${c.id}/" data-preview="${i}"><span class="mega__num">${pad(i + 1)}</span><span class="mega__title">${c.title}</span><span class="mega__sub">${c.short}</span></a></li>`,
   ).join('');
   const previews = CATEGORIES.map((c, i) => {
     const cover = coverOf(c.id);
@@ -53,7 +57,7 @@ export function header() {
       ? img(cover.image, '', '380px', `data-preview-img="${i}" class="${cls.trim()}"`)
       : `<div class="mono-tile${cls}" data-preview-img="${i}">${svg('monogram')}</div>`;
   }).join('');
-  const mobileCats = CATEGORIES.map((c) => `<li><a href="/creations/#${c.id}">${c.title}</a></li>`).join('');
+  const mobileCats = CATEGORIES.map((c) => `<li><a href="/creations/${c.id}/">${c.title}</a></li>`).join('');
 
   return `
 <a class="skip" href="#main">Aller au contenu</a>
@@ -113,7 +117,7 @@ export function socialIcons() {
 }
 
 export function footer() {
-  const cats = CATEGORIES.map((c) => `<li><a class="link-line" href="/creations/#${c.id}">${c.title}</a></li>`).join('');
+  const cats = CATEGORIES.map((c) => `<li><a class="link-line" href="/creations/${c.id}/">${c.title}</a></li>`).join('');
   return `
 <footer class="footer" data-header-theme="dark">
   <div class="wrap">
@@ -171,7 +175,7 @@ export function homeCats() {
   return CATEGORIES.map((c, i) => {
     const cover = coverOf(c.id);
     const m = cover ? img(cover.image, `${c.title} — ${cover.title}`) : monoTile(true);
-    return `<a class="cat reveal-up" href="/creations/#${c.id}" data-tilt data-cursor="Voir">
+    return `<a class="cat reveal-up" href="/creations/${c.id}/" data-tilt data-cursor="Voir">
   <div class="cat__inner">
     <div class="cat__media">${m}</div>
     <div class="cat__body">
@@ -184,11 +188,12 @@ export function homeCats() {
 }
 
 export function showcase() {
-  const slides = withImages()
+  const featured = withImages().filter((c) => c.featured);
+  const slides = (featured.length ? featured : withImages())
     .map(
       (c, i) => `<article class="slide" data-cursor="Voir">
   <span class="slide__index" aria-hidden="true">${pad(i + 1)}</span>
-  <a class="slide__frame" href="/creations/#${c.category}" aria-label="${esc(c.title)}">${img(c.image, c.title, '(max-width: 760px) 74vw, 30vw', 'data-parallax')}</a>
+  <a class="slide__frame" href="/creations/${c.category}/" aria-label="${esc(c.title)}">${img(c.image, c.title, '(max-width: 760px) 74vw, 30vw', 'data-parallax')}</a>
   <div class="slide__meta"><h3 class="slide__title">${c.title}</h3><span class="slide__occ">${c.tag}</span></div>
 </article>`,
     )
@@ -200,36 +205,51 @@ export function showcase() {
 </div>`;
 }
 
-// ─── Page Créations ───
-export function filters() {
-  const all = `<button class="filter" type="button" data-filter="all" aria-pressed="true">Tout<sup>${CREATIONS.length}</sup></button>`;
+// ─── Pages Créations (une par section) ───
+const catOf = (id) => CATEGORIES.find((c) => c.id === id);
+
+export function sectionNav(id) {
+  return CATEGORIES.map(
+    (c) => `<a class="filter" href="/creations/${c.id}/"${c.id === id ? ' aria-current="page"' : ''}>${c.title}<sup>${countOf(c.id) || '·'}</sup></a>`,
+  ).join('');
+}
+
+export function tagFilters(id) {
+  const cat = catOf(id);
+  if (!cat?.tags) return '';
+  const n = (t) => CREATIONS.filter((c) => c.category === id && c.tag === t).length;
   return (
-    all +
-    CATEGORIES.map(
-      (c) => `<button class="filter" type="button" data-filter="${c.id}" aria-pressed="false">${c.title}<sup>${countOf(c.id) || '·'}</sup></button>`,
-    ).join('')
+    `<button class="filter" type="button" data-filter="all" aria-pressed="true">Tout<sup>${countOf(id)}</sup></button>` +
+    cat.tags.map((t) => `<button class="filter" type="button" data-filter="${slug(t)}" aria-pressed="false">${t}<sup>${n(t)}</sup></button>`).join('')
   );
 }
 
-export function gallery() {
-  const cards = CREATIONS.map((c) => {
-    const cat = CATEGORIES.find((k) => k.id === c.category);
-    return `<button class="card reveal-up" type="button" data-cat="${c.category}" data-id="${c.id}" data-img="${hasImage(c.image) ? c.image : ''}" data-cursor="Voir">
+export function sectionTitle(id) {
+  return catOf(id).title;
+}
+export function sectionText(id) {
+  return catOf(id).text;
+}
+
+export function gallery(id) {
+  const list = CREATIONS.filter((c) => c.category === id);
+  if (!list.length) {
+    const cat = catOf(id);
+    return `<div class="card card--soon">
+  <div class="card__media">${monoTile(true)}</div>
+  <h3 class="card__title">${cat.title}</h3>
+  <p class="card__desc">La galerie arrive bientôt. En attendant, parlons de votre projet : <a class="link-line" href="/commander/">passer commande</a>.</p>
+</div>`;
+  }
+  return list
+    .map(
+      (c) => `<button class="card reveal-up" type="button" data-id="${c.id}" data-tag="${slug(c.tag)}" data-img="${hasImage(c.image) ? c.image : ''}" data-cursor="Voir">
   <div class="card__media">${media(c)}<span class="card__tag">${c.tag}</span></div>
   <h3 class="card__title">${c.title}</h3>
   <p class="card__desc">${c.description}</p>
-</button>`;
-  }).join('');
-  const soon = CATEGORIES.filter((c) => !countOf(c.id))
-    .map(
-      (c) => `<div class="card card--soon" data-cat="${c.id}" data-soon hidden>
-  <div class="card__media">${monoTile(true)}</div>
-  <h3 class="card__title">${c.title}</h3>
-  <p class="card__desc">La galerie arrive bientôt. En attendant, parlons de votre projet : <a class="link-line" href="/commander/?categorie=${c.id}">demander un devis</a>.</p>
-</div>`,
+</button>`,
     )
     .join('');
-  return cards + soon;
 }
 
 // ─── Page Commander ───
@@ -241,7 +261,8 @@ export function occasionChoices() {
 
 export function productPicks() {
   return CATEGORIES.map((cat) => {
-    const items = CREATIONS.filter((c) => c.category === cat.id)
+    const all = CREATIONS.filter((c) => c.category === cat.id);
+    const items = (all.length > 12 ? all.filter((c) => c.featured) : all)
       .map(
         (c) => `<label class="pick"><input type="checkbox" name="creations" value="${esc(c.title)}" data-id="${c.id}"><span class="pick__media">${media(c, '160px')}<i class="pick__check">${ICONS.check}</i></span><span class="pick__name">${c.title}</span></label>`,
       )

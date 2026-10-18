@@ -1,5 +1,6 @@
 import { initCommon } from './common.js';
 import { CONTACT } from './config.js';
+import { CREATIONS } from './data.js';
 import { checkRequired, openEmail, openWhatsApp } from './send.js';
 
 initCommon();
@@ -13,6 +14,10 @@ const pre = params.get('creation');
 if (pre) {
   const box = form.querySelector(`input[name="creations"][data-id="${CSS.escape(pre)}"]`);
   if (box) box.checked = true;
+  else {
+    const c = CREATIONS.find((k) => k.id === pre);
+    if (c) form.details.value = `Modèle : ${c.title}\n`;
+  }
 }
 
 // Date minimum : maintenant + délai de préparation

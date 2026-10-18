@@ -1,3 +1,4 @@
+// Page d'une section (/creations/<id>/) : sous-filtres et visionneuse.
 import { initCommon, gsap, ScrollTrigger, lenis, reducedMotion } from './common.js';
 import { Flip } from 'gsap/Flip';
 import { CATEGORIES } from './config.js';
@@ -7,57 +8,50 @@ gsap.registerPlugin(Flip);
 initCommon();
 
 const grid = document.querySelector('.gallery');
-const items = [...grid.children];
-const filters = [...document.querySelectorAll('.filter')];
-const titleEl = document.querySelector('[data-cat-title]');
-const textEl = document.querySelector('[data-cat-text]');
-const defaults = { title: titleEl.textContent, text: textEl.textContent };
+const cards = [...grid.querySelectorAll('.card[data-id]')];
+const filters = [...document.querySelectorAll('.tagbar .filter')];
 
-function applyFilter(id, animate = true) {
-  const cat = CATEGORIES.find((c) => c.id === id);
-  if (!cat) id = 'all';
-  filters.forEach((f) => f.setAttribute('aria-pressed', String(f.dataset.filter === id)));
-  const state = Flip.getState(items);
-  items.forEach((el) => {
-    const match = id === 'all' ? !el.hasAttribute('data-soon') : el.dataset.cat === id;
-    el.hidden = !match;
-    if (match) gsap.set(el, { opacity: 1, y: 0 });
+// ─── Sous-filtres (ex. Enfants, Naissance…) ───
+function applyFilter(tag, animate = true) {
+  if (!filters.some((f) => f.dataset.filter === tag)) tag = 'all';
+  filters.forEach((f) => f.setAttribute('aria-pressed', String(f.dataset.filter === tag)));
+  const state = Flip.getState(cards);
+  cards.forEach((el) => {
+    el.hidden = tag !== 'all' && el.dataset.tag !== tag;
+    if (!el.hidden) gsap.set(el, { opacity: 1, y: 0 });
   });
-  titleEl.textContent = cat ? cat.title : defaults.title;
-  textEl.textContent = cat ? cat.text : defaults.text;
-  if (animate && !reducedMotion) {
-    Flip.from(state, {
-      duration: 0.8,
-      ease: 'expo.out',
-      absolute: true,
-      onEnter: (els) => gsap.fromTo(els, { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.8, ease: 'expo.out' }),
-      onLeave: (els) => gsap.to(els, { opacity: 0, scale: 0.94, duration: 0.4 }),
-      onComplete: () => ScrollTrigger.refresh(),
-    });
-  }
+  if (!animate || reducedMotion) return ScrollTrigger.refresh();
+  Flip.from(state, {
+    duration: 0.8,
+    ease: 'expo.out',
+    absolute: true,
+    onEnter: (els) => gsap.fromTo(els, { opacity: 0, scale: 0.94 }, { opacity: 1, scale: 1, duration: 0.8, ease: 'expo.out' }),
+    onLeave: (els) => gsap.to(els, { opacity: 0, scale: 0.94, duration: 0.4 }),
+    onComplete: () => ScrollTrigger.refresh(),
+  });
 }
 
 filters.forEach((f) =>
   f.addEventListener('click', () => {
-    const id = f.dataset.filter;
-    history.replaceState(null, '', id === 'all' ? location.pathname : `#${id}`);
-    applyFilter(id);
+    const tag = f.dataset.filter;
+    history.replaceState(null, '', tag === 'all' ? location.pathname : `#${tag}`);
+    applyFilter(tag);
   }),
 );
-window.addEventListener('hashchange', () => applyFilter(location.hash.slice(1)));
-applyFilter(location.hash.slice(1), false);
+if (filters.length) applyFilter(location.hash.slice(1), false);
 
-// ─── Lightbox ───
+// ─── Visionneuse ───
 const lb = document.querySelector('.lightbox');
 const lbImg = lb.querySelector('.lightbox__media img');
 const lbMono = lb.querySelector('.lightbox__media .mono-tile');
+let list = [];
 let current = 0;
 let lastFocus = null;
-const visible = () => CREATIONS.filter((c) => !grid.querySelector(`[data-id="${c.id}"]`).hidden);
 
-function fill(c) {
+function fill(card) {
+  const c = CREATIONS.find((k) => k.id === card.dataset.id);
   const cat = CATEGORIES.find((k) => k.id === c.category);
-  const image = grid.querySelector(`[data-id="${c.id}"]`).dataset.img;
+  const image = card.dataset.img;
   lbImg.hidden = !image;
   lbMono.hidden = !!image;
   if (image) lbImg.src = `/img/${image}-1400.webp`;
@@ -68,9 +62,9 @@ function fill(c) {
   lb.querySelector('[data-lb-desc]').textContent = c.description;
   lb.querySelector('[data-lb-order]').href = `/commander/?creation=${encodeURIComponent(c.id)}`;
 }
-function open(id) {
-  const list = visible();
-  current = Math.max(0, list.findIndex((c) => c.id === id));
+function open(card) {
+  list = cards.filter((c) => !c.hidden);
+  current = Math.max(0, list.indexOf(card));
   fill(list[current]);
   lastFocus = document.activeElement;
   lb.classList.add('is-open');
@@ -85,13 +79,12 @@ function close() {
   lastFocus?.focus();
 }
 function step(d) {
-  const list = visible();
   current = (current + d + list.length) % list.length;
   fill(list[current]);
 }
 grid.addEventListener('click', (e) => {
   const card = e.target.closest('.card[data-id]');
-  if (card) open(card.dataset.id);
+  if (card) open(card);
 });
 lb.querySelector('.lightbox__close').addEventListener('click', close);
 lb.querySelector('[data-lb-prev]').addEventListener('click', () => step(-1));

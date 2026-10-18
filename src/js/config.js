@@ -19,18 +19,21 @@ export const CONTACT = {
   minDelayHours: 48,
 };
 
+// Les sections du menu « Créations » : chacune a sa page /creations/<id>/.
+// `tags` (facultatif) = sous-filtres affichés sur la page de la section.
 export const CATEGORIES = [
   {
-    id: 'personnalises',
-    title: 'Gâteaux personnalisés',
-    short: 'Anniversaires, fêtes & thèmes',
-    text: 'Des pièces uniques imaginées autour de votre histoire : prénom, âge, couleurs, univers. Comptez 5 à 7 jours pour une création sur-mesure.',
+    id: 'gateaux',
+    title: 'Gâteaux',
+    short: 'Anniversaires, enfants, fêtes & sur-mesure',
+    text: 'Des pièces uniques imaginées autour de votre histoire : prénom, âge, thème, couleurs. Comptez 5 à 7 jours pour une création sur-mesure.',
+    tags: ['Anniversaire', 'Enfants', 'Naissance', 'Amour', 'Fêtes'],
   },
   {
     id: 'trompe-loeil',
-    title: 'Trompe-l’œil & entremets',
+    title: 'Trompe-l’œil',
     short: 'Les signatures de la maison',
-    text: 'L’illusion parfaite : des entremets qui ressemblent à s’y méprendre à une cacahuète ou un grain de café, et des finitions velours.',
+    text: 'L’illusion parfaite : des entremets qui ressemblent à s’y méprendre à une cacahuète ou à un grain de café.',
   },
   {
     id: 'tunisiennes',
@@ -49,6 +52,12 @@ export const CATEGORIES = [
     title: 'Salé',
     short: 'Fricassés, wraps & burgers',
     text: 'Fricassés au thon, mini wraps, burgers gourmets : une généreuse parenthèse méditerranéenne pour vos brunchs, apéritifs et événements.',
+  },
+  {
+    id: 'jus',
+    title: 'Jus',
+    short: 'Jus maison',
+    text: 'Des jus maison pour accompagner vos tables de fête, brunchs et événements.',
   },
 ];
 

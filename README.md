@@ -5,7 +5,7 @@ Site vitrine 3D de **L’instant Gourmand** — pâtisserie franco-tunisienne su
 | Page | URL |
 | --- | --- |
 | Accueil : gâteau 3D (Three.js) qui se découpe et s’éclate au scroll, catégories, vitrine, atelier, étapes | `/` |
-| Créations : galerie filtrable (personnalisés, trompe-l’œil & entremets, douceurs tunisiennes, coffrets, salé) | `/creations/` |
+| Créations : les sections, puis une page par section avec toutes ses photos et des sous-filtres | `/creations/`, `/creations/gateaux/`, `/creations/coffrets/`… |
 | Commander : occasion, créations, date (48 h mini) et créneau, envoi par WhatsApp ou e-mail, FAQ | `/commander/` |
 | Contact : WhatsApp / téléphone / e-mail, formulaire, atelier et carte, réseaux | `/contact/` |
 
@@ -38,7 +38,7 @@ Le dossier `dist/` est un site statique : il s’héberge partout (Vercel, Netli
 | Quoi | Où |
 | --- | --- |
 | Téléphone, WhatsApp, e-mail, Instagram, Facebook, ville, horaires, délai | `src/js/config.js` (`CONTACT`) |
-| Catégories du menu « Créations » | `src/js/config.js` (`CATEGORIES`) |
+| Sections du menu « Créations » (une page est créée automatiquement pour chacune) et leurs sous-filtres | `src/js/config.js` (`CATEGORIES`) |
 | Occasions et FAQ de la page Commander | `src/js/config.js` (`OCCASIONS`, `FAQ`) |
 | Gâteaux affichés (titre, catégorie, description, photo) | `src/js/data.js` |
 | Photos | `public/img/` (`nom-800.webp` et `nom-1400.webp`) |
@@ -46,7 +46,7 @@ Le dossier `dist/` est un site statique : il s’héberge partout (Vercel, Netli
 
 **Ajouter une photo** : déposer l’original dans `photos/` en le nommant comme le champ `image` de `src/js/data.js` (ex. `photos/trompe-loeil-cafe.jpg`), puis `npm run photos`. Tant qu’une création n’a pas de photo, elle s’affiche avec le monogramme et « Photos à venir ».
 
-**Ajouter une création** : ajouter une entrée dans `src/js/data.js` (titre, catégorie, étiquette, description, nom de photo). Elle apparaît automatiquement dans la galerie, le formulaire de commande, et — si elle a une photo — dans la vitrine de l’accueil et l’aperçu du menu.
+**Ajouter une création** : ajouter une entrée dans `src/js/data.js` (titre, section, étiquette, description, nom de photo ; `featured: true` pour la mettre en avant sur l’accueil). Elle apparaît automatiquement dans la galerie, le formulaire de commande, et — si elle a une photo — dans la vitrine de l’accueil et l’aperçu du menu.
 
 ## Technique
 

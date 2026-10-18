@@ -15,7 +15,6 @@ const SIZES = [800, 1400];
 
 // Nom de la photo sur le site  ←  fichier sur l'ancien site WordPress
 const WORDPRESS = {
-  'gateau-anniversaire': '2026/04/gateau-anniverssaire.jpg',
   'trompe-loeil-cacahuete': '2026/04/trompe-l-oeil-cachauette.jpg',
   'trompe-loeil-cafe': '2026/04/trompe-l-oeil-cafe.jpg',
   'gateau-pistache-ramadan': '2026/04/gateau-pistache-ramadan.jpg',
