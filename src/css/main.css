@@ -1,3 +1,8 @@
+/* Polices hébergées sur le site (pas d'appel à Google : plus rapide et conforme RGPD) */
+@import '@fontsource/italiana/400.css';
+@import '@fontsource/tenor-sans/400.css';
+@import '@fontsource/pinyon-script/400.css';
+
 /* ───────────────────────── L'instant Gourmand ─────────────────────────
    Charte : #4C1212 · #69302C · #89564C · #AB8275 · #D1B6A5 · #FBEFDC
    Titres : Italiana (proche d'Agraham) · Texte : Tenor Sans · Accents : Pinyon Script
@@ -277,7 +282,7 @@ button {
   align-items: center;
   justify-content: space-between;
   padding: 0 var(--gutter);
-  color: var(--creme);
+  color: var(--bordeaux-900);
   transition:
     transform 0.6s var(--ease),
     background 0.5s,
@@ -292,13 +297,29 @@ button {
   -webkit-backdrop-filter: blur(14px) saturate(1.2);
   color: var(--bordeaux-900);
 }
+.header.is-dark {
+  color: var(--creme);
+}
 .header.is-solid.is-dark {
   background: color-mix(in srgb, var(--bordeaux-900) 78%, transparent);
-  color: var(--creme);
 }
 .header__logo {
   display: block;
-  width: clamp(150px, 15vw, 210px);
+  width: clamp(160px, 15vw, 230px);
+}
+/* Logo officiel (vectorisé depuis le PNG de la charte), recolorable via currentColor */
+.brand-logo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4180 / 835;
+  background-color: currentColor;
+  -webkit-mask: url('/brand/logo-ig.svg') center / contain no-repeat;
+  mask: url('/brand/logo-ig.svg') center / contain no-repeat;
+}
+.brand-logo--word {
+  aspect-ratio: 4180 / 500;
+  -webkit-mask-image: url('/brand/wordmark-ig.svg');
+  mask-image: url('/brand/wordmark-ig.svg');
 }
 .header__logo svg,
 .header__logo img {
@@ -336,7 +357,6 @@ button {
   padding: 13px 22px;
   font-size: 0.68rem;
 }
-.header:not(.is-solid) .nav .btn,
 .header.is-dark .nav .btn {
   --bg: var(--creme);
   --fg: var(--bordeaux-900);
@@ -677,10 +697,10 @@ button {
 }
 .stage {
   background:
-    radial-gradient(70% 60% at 50% 45%, #6a2620 0%, transparent 70%),
-    radial-gradient(120% 90% at 50% 120%, var(--bordeaux-950), transparent 60%),
-    var(--bordeaux-900);
-  color: var(--creme);
+    radial-gradient(60% 55% at 50% 58%, #fff8ec 0%, transparent 70%),
+    radial-gradient(120% 80% at 50% 120%, #f1dcc6, transparent 60%),
+    var(--creme);
+  color: var(--bordeaux-900);
 }
 .hero {
   position: relative;
@@ -689,19 +709,14 @@ button {
   min-height: 560px;
   overflow: hidden;
 }
-.hero__word {
+.hero__logo {
   position: absolute;
+  z-index: 3;
   left: 50%;
-  top: 46%;
-  width: min(92vw, 1500px);
-  translate: -50% -50%;
-  color: var(--creme);
-  opacity: 0.95;
-}
-.hero__word svg {
-  width: 100%;
-  height: auto;
-  overflow: visible;
+  top: calc(var(--header-h) + clamp(20px, 5vh, 60px));
+  width: min(84vw, 920px);
+  translate: -50% 0;
+  color: var(--bordeaux-900);
 }
 .hero__bottom {
   position: absolute;
@@ -752,7 +767,7 @@ button {
 .scroll-hint i {
   width: 1px;
   height: 46px;
-  background: linear-gradient(var(--creme), transparent);
+  background: linear-gradient(currentColor, transparent);
   animation: hint 2.2s var(--ease) infinite;
   transform-origin: top;
 }
@@ -797,7 +812,7 @@ button {
   visibility: hidden;
 }
 .story__step .eyebrow {
-  color: var(--nude);
+  color: var(--cacao);
   margin-bottom: 22px;
 }
 .story__step p {
@@ -832,8 +847,8 @@ button {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--gold-2);
-  box-shadow: 0 0 0 4px rgba(242, 213, 154, 0.2);
+  background: var(--gold);
+  box-shadow: 0 0 0 4px rgba(217, 178, 106, 0.25);
 }
 .label3d::after {
   content: '';
@@ -842,7 +857,7 @@ button {
 .label3d span {
   display: inline-block;
   padding-left: 10px;
-  border-left: 1px solid rgba(251, 239, 220, 0.4);
+  border-left: 1px solid rgba(76, 18, 18, 0.35);
 }
 .story__progress {
   position: absolute;
@@ -859,14 +874,14 @@ button {
   display: block;
   width: 1px;
   height: 140px;
-  background: rgba(251, 239, 220, 0.2);
+  background: rgba(76, 18, 18, 0.15);
   position: relative;
   margin: 0 auto;
 }
 .story__progress b i {
   position: absolute;
   inset: 0;
-  background: var(--gold-2);
+  background: var(--gold);
   transform: scaleY(0);
   transform-origin: top;
 }
@@ -1810,8 +1825,8 @@ button {
   .nav > .btn {
     display: none;
   }
-  .hero__word {
-    top: 22%;
+  .hero__logo {
+    width: 88vw;
   }
   .hero__bottom {
     flex-direction: column;
@@ -1828,7 +1843,7 @@ button {
     right: 0;
     width: auto;
     padding: 80px var(--gutter) 36px;
-    background: linear-gradient(transparent, rgba(46, 9, 9, 0.92) 40%);
+    background: linear-gradient(transparent, rgba(251, 239, 220, 0.96) 40%);
   }
   .story__step .h2 {
     font-size: 2.6rem;
@@ -2449,4 +2464,45 @@ button {
 }
 .page-hero .eyebrow a {
   color: inherit;
+}
+
+/* Accueil sur fond crème : textes de l'histoire 3D lisibles sur mobile */
+@media (max-width: 760px) {
+  .story__step {
+    background: linear-gradient(transparent, rgba(251, 239, 220, 0.96) 40%);
+  }
+}
+.loader__mono .brand-logo,
+.footer__logo .brand-logo {
+  color: var(--creme);
+}
+.footer__big .brand-logo {
+  color: var(--bordeaux-700);
+}
+.map-consent {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 10px;
+  padding: 30px;
+  text-align: center;
+  color: var(--creme);
+  background:
+    radial-gradient(60% 60% at 50% 50%, var(--bordeaux-700), transparent 70%),
+    var(--bordeaux-900);
+  cursor: pointer;
+}
+.map-consent__title {
+  font-family: var(--ff-display);
+  font-size: 2rem;
+}
+.map-consent__text {
+  font-size: 0.85rem;
+  opacity: 0.7;
+  max-width: 26em;
+}
+.map-consent:hover .map-consent__title {
+  text-decoration: underline;
+  text-underline-offset: 6px;
 }

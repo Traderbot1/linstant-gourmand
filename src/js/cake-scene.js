@@ -1,46 +1,66 @@
-// Scène 3D : un gâteau velours entièrement procédural (aucun modèle à charger),
-// découpé en couches et en une part, piloté par le scroll depuis home.js.
+// Scène 3D : le gâteau cœur « Birthday Queen » de l'atelier, modélisé entièrement en code
+// (aucun modèle à télécharger). Au scroll, piloté depuis home.js : la couronne et le topper
+// s'envolent, le fondant se soulève et les couches se séparent.
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
-import { SVGLoader } from 'three/examples/jsm/loaders/SVGLoader.js';
 
 const TAU = Math.PI * 2;
-const R = 1.5; // rayon du gâteau
-const SLICE_START = 0;
-const SLICE_LEN = Math.PI / 3;
-const SLICE_DIR = SLICE_START + SLICE_LEN / 2;
-const DECOR_THETA = Math.PI; // côté décoré, opposé à la part
+const S = 0.1; // échelle de la courbe du cœur (largeur ≈ 3,2)
+const INNER = 0.955; // les couches sont légèrement plus petites que le fondant qui les enveloppe
 
-// Angles de rotation du gâteau : départ (décor face caméra) et révélation (part vers la caméra).
-export const ROT_START = -0.35 - DECOR_THETA;
-export const ROT_REVEAL = 0.62 - SLICE_DIR;
+// Angles du gâteau : départ (pointe du cœur face à la caméra) et vue « éclatée ».
+export const ROT_START = -0.32;
+export const ROT_REVEAL = 0.85;
 
 // Couches, de bas en haut. `label` = texte affiché lors de l'éclaté.
 export const LAYERS = [
-  { h: 0.46, color: '#e3b67f', crumb: true, label: 'Biscuit moelleux' },
+  { h: 0.42, color: '#e6b77c', crumb: true, label: 'Biscuit moelleux' },
   { h: 0.12, color: '#fbefdc', label: 'Crème légère' },
-  { h: 0.16, color: '#a3283a', gloss: true, label: 'Cœur fruité' },
+  { h: 0.16, color: '#b0182c', gloss: true, label: 'Cœur framboise' },
   { h: 0.12, color: '#fbefdc' },
-  { h: 0.46, color: '#6e3b2b', crumb: true, label: 'Biscuit cacao' },
-  { h: 0.1, color: '#4c1212', gloss: true, label: 'Ganache & velours' },
+  { h: 0.42, color: '#7a4330', crumb: true, label: 'Biscuit cacao' },
+  { h: 0.1, color: '#4c1212', gloss: true, label: 'Ganache' },
 ];
+const H = LAYERS.reduce((a, l) => a + l.h, 0);
 
-// Bruit périodique (fréquences entières) pour le col « déchiré » : raccord parfait entre la part et le gâteau.
-const tornNoise = (t) =>
-  0.05 * Math.sin(3 * t + 1.3) +
-  0.03 * Math.sin(7 * t + 0.4) +
-  0.016 * Math.sin(19 * t + 2.1) +
-  0.01 * Math.sin(53 * t) * Math.sin(31 * t + 0.7);
+// Contour du cœur (courbe classique), centré sur l'origine.
+function heartShape(scale = 1, n = 160) {
+  const pts = [];
+  for (let i = 0; i < n; i++) {
+    const t = (i / n) * TAU;
+    const x = 16 * Math.sin(t) ** 3;
+    const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t) + 2.5;
+    pts.push(new THREE.Vector2(x * S * scale, y * S * scale));
+  }
+  return new THREE.Shape(pts);
+}
 
-function canvasTexture(size, draw, { repeat = 1, srgb = false } = {}) {
+// Extrusion verticale : la forme est dans le plan XZ, la pointe du cœur vers +Z (vers la caméra).
+function heartSlab(scale, height, bevel = 0) {
+  const geo = new THREE.ExtrudeGeometry(heartShape(scale), {
+    depth: height,
+    bevelEnabled: bevel > 0,
+    bevelThickness: bevel,
+    bevelSize: bevel,
+    bevelSegments: 10,
+    curveSegments: 1,
+    steps: 1,
+  });
+  geo.rotateX(-Math.PI / 2);
+  geo.computeVertexNormals();
+  return geo;
+}
+
+function canvasTexture(size, draw, { repeat = 1, srgb = false, w = size, h = size } = {}) {
   const c = document.createElement('canvas');
-  c.width = c.height = size;
-  draw(c.getContext('2d'), size);
+  c.width = w;
+  c.height = h;
+  draw(c.getContext('2d'), w, h);
   const t = new THREE.CanvasTexture(c);
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
   t.repeat.set(repeat, repeat);
   if (srgb) t.colorSpace = THREE.SRGBColorSpace;
-  t.anisotropy = 4;
+  t.anisotropy = 8;
   return t;
 }
 
@@ -50,15 +70,28 @@ function makeTextures() {
     (ctx, s) => {
       const img = ctx.createImageData(s, s);
       for (let i = 0; i < img.data.length; i += 4) {
-        const v = 170 + Math.random() * 85;
+        const v = 190 + Math.random() * 65;
         img.data[i] = img.data[i + 1] = img.data[i + 2] = v;
         img.data[i + 3] = 255;
       }
       ctx.putImageData(img, 0, 0);
     },
-    { repeat: 8 },
+    { repeat: 3 },
   );
-
+  // Pailletage du fondant : quelques points brillants (rugosité plus faible).
+  const sparkle = canvasTexture(
+    512,
+    (ctx, s) => {
+      ctx.fillStyle = '#b4b4b4';
+      ctx.fillRect(0, 0, s, s);
+      for (let i = 0; i < 2600; i++) {
+        const v = Math.random() < 0.5 ? 40 : 90;
+        ctx.fillStyle = `rgb(${v},${v},${v})`;
+        ctx.fillRect(Math.random() * s, Math.random() * s, 1.4, 1.4);
+      }
+    },
+    { repeat: 2 },
+  );
   const crumb = canvasTexture(
     512,
     (ctx, s) => {
@@ -72,115 +105,118 @@ function makeTextures() {
         ctx.fill();
       }
     },
-    { srgb: true },
+    { srgb: true, repeat: 1.2 },
   );
-
   const dot = canvasTexture(64, (ctx, s) => {
     const g = ctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
-    g.addColorStop(0, 'rgba(255,255,255,1)');
-    g.addColorStop(0.25, 'rgba(255,240,200,0.8)');
-    g.addColorStop(1, 'rgba(255,220,150,0)');
+    g.addColorStop(0, 'rgba(255,236,190,1)');
+    g.addColorStop(0.35, 'rgba(230,190,110,0.8)');
+    g.addColorStop(1, 'rgba(217,178,106,0)');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, s, s);
   });
-
   const shadow = canvasTexture(256, (ctx, s) => {
     const g = ctx.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
-    g.addColorStop(0, 'rgba(20,4,4,0.75)');
-    g.addColorStop(0.55, 'rgba(20,4,4,0.35)');
-    g.addColorStop(1, 'rgba(20,4,4,0)');
+    g.addColorStop(0, 'rgba(76,18,18,0.42)');
+    g.addColorStop(0.5, 'rgba(76,18,18,0.16)');
+    g.addColorStop(1, 'rgba(76,18,18,0)');
     ctx.fillStyle = g;
     ctx.fillRect(0, 0, s, s);
   });
-
-  return { grain, crumb, dot, shadow };
+  return { grain, sparkle, crumb, dot, shadow };
 }
 
-// UV en unités monde, pour que la mie garde les mêmes proportions sur chaque face.
-function worldUV(geo, w, h, density = 0.7) {
-  const uv = geo.attributes.uv;
-  for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * w * density, uv.getY(i) * h * density);
+// Le topper doré « Birthday Queen », dessiné avec les polices du site puis découpé (alphaMap).
+function topperTexture() {
+  const w = 1024;
+  const h = 640;
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = h;
+  const ctx = c.getContext('2d');
+  const draw = () => {
+    ctx.clearRect(0, 0, w, h);
+    ctx.save();
+    // Étiré en hauteur : posé à plat et vu de biais, le texte retrouve ses proportions.
+    ctx.scale(1, 1.55);
+    ctx.fillStyle = ctx.strokeStyle = '#fff';
+    ctx.lineJoin = 'round';
+    ctx.font = '400 300px "Pinyon Script", cursive';
+    ctx.lineWidth = 9;
+    ctx.strokeText('Queen', 60, 360);
+    ctx.fillText('Queen', 60, 360);
+    ctx.font = '400 104px "Italiana", "Didot", serif';
+    ctx.lineWidth = 3;
+    ctx.strokeText('BIRTHDAY', 380, 175);
+    ctx.fillText('BIRTHDAY', 380, 175);
+    ctx.restore();
+    tex.needsUpdate = true;
+  };
+  const tex = new THREE.CanvasTexture(c);
+  draw();
+  document.fonts?.load('300px "Pinyon Script"').then(draw).catch(() => {});
+  document.fonts?.load('80px "Italiana"').then(draw).catch(() => {});
+  return tex;
 }
 
-// Une portion de cylindre fermée (couche du gâteau ou de la part).
-function wedge(h, start, len, mats, cuts) {
+function smallHeart(mat, size) {
+  const m = new THREE.Mesh(heartSlab(1, 0.35, 0.18), mat);
+  m.geometry.center();
+  m.scale.setScalar(size);
+  return m;
+}
+
+function crown(gold, gem) {
   const g = new THREE.Group();
-  const segs = Math.max(10, Math.round((128 * len) / TAU));
-  const geo = new THREE.CylinderGeometry(R, R, h, segs, 1, false, start, len);
-  g.add(new THREE.Mesh(geo, [mats.side, mats.top, mats.cut]));
-  for (const theta of [start, start + len]) {
-    const pg = new THREE.PlaneGeometry(R, h);
-    worldUV(pg, R, h);
-    const p = new THREE.Mesh(pg, mats.cut);
-    p.rotation.y = theta - Math.PI / 2;
-    p.position.set((Math.sin(theta) * R) / 2, 0, (Math.cos(theta) * R) / 2);
-    g.add(p);
-    cuts.push(p);
-  }
-  return g;
-}
-
-// Col velours au bord déchiré + liseré d'or, comme sur les créations de la maison.
-function collar(start, len, velvet, gold) {
-  const g = new THREE.Group();
-  const segs = Math.max(12, Math.round((220 * len) / TAU));
-  const geo = new THREE.CylinderGeometry(R + 0.006, R + 0.006, 1, segs, 1, true, start, len);
-  const pos = geo.attributes.position;
-  const rim = [];
-  for (let i = 0; i < pos.count; i++) {
-    const col = i % (segs + 1);
-    const theta = start + (col / segs) * len;
-    if (i <= segs) {
-      const y = 0.17 + tornNoise(theta);
-      pos.setY(i, y);
-      rim.push(new THREE.Vector3(Math.sin(theta) * (R + 0.006), y, Math.cos(theta) * (R + 0.006)));
-    } else {
-      pos.setY(i, -0.02);
-    }
-  }
-  geo.computeVertexNormals();
-  const wall = new THREE.Mesh(geo, velvet);
-  g.add(wall);
-  const tube = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(rim), segs * 2, 0.016, 6, false);
-  g.add(new THREE.Mesh(tube, gold));
-  return g;
-}
-
-function flower(petalMat, centerMat, size) {
-  const g = new THREE.Group();
-  const petal = new THREE.SphereGeometry(1, 12, 8);
-  for (const [count, len, tilt, offset] of [
-    [14, 1, 0.25, 0],
-    [10, 0.72, 0.55, 0.3],
+  const R = 0.2;
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(R, 0.022, 12, 64), gold);
+  ring.rotation.x = Math.PI / 2;
+  ring.position.y = 0.03;
+  g.add(ring);
+  // Deux rangées d'arches en zigzag, la seconde décalée et plus basse
+  for (const [n, height, flare, offset, y0] of [
+    [6, 0.42, 1.28, 0, 0.03],
+    [6, 0.26, 1.12, Math.PI / 6, 0.05],
   ]) {
-    for (let i = 0; i < count; i++) {
-      const a = (i / count) * TAU + offset;
-      const m = new THREE.Mesh(petal, petalMat);
-      m.scale.set(0.11 * len, 0.03, 0.34 * len);
-      m.position.set(Math.sin(a) * 0.3 * len, 0, Math.cos(a) * 0.3 * len);
-      m.rotation.set(0, a, 0);
-      m.rotateX(-tilt);
-      g.add(m);
+    const path = new THREE.CurvePath();
+    const pts = [];
+    for (let k = 0; k <= n * 2; k++) {
+      const a = (k / (n * 2)) * TAU + offset;
+      const top = k % 2 === 1;
+      const r = top ? R * flare : R;
+      pts.push(new THREE.Vector3(Math.cos(a) * r, top ? y0 + height : y0, Math.sin(a) * r));
+    }
+    for (let k = 0; k < pts.length - 1; k++) path.add(new THREE.LineCurve3(pts[k], pts[k + 1]));
+    g.add(new THREE.Mesh(new THREE.TubeGeometry(path, n * 16, 0.014, 6, false), gold));
+    pts.forEach((p, k) => {
+      if (k % 2 === 1) {
+        const tip = new THREE.Mesh(new THREE.SphereGeometry(height > 0.3 ? 0.032 : 0.022, 16, 12), gold);
+        tip.position.copy(p);
+        g.add(tip);
+      }
+    });
+    // Strass le long des arches
+    for (let k = 0; k < pts.length - 1; k++) {
+      for (let j = 1; j < 4; j++) {
+        const s = new THREE.Mesh(new THREE.SphereGeometry(0.011, 8, 6), gem);
+        s.position.lerpVectors(pts[k], pts[k + 1], j / 4);
+        g.add(s);
+      }
     }
   }
-  const c = new THREE.Mesh(new THREE.SphereGeometry(0.13, 16, 12), centerMat);
-  c.scale.y = 0.6;
-  c.position.y = 0.06;
-  g.add(c);
-  g.scale.setScalar(size);
+  for (let k = 0; k < 28; k++) {
+    const a = (k / 28) * TAU;
+    const s = new THREE.Mesh(new THREE.SphereGeometry(0.013, 8, 6), gem);
+    s.position.set(Math.cos(a) * (R + 0.02), 0.03, Math.sin(a) * (R + 0.02));
+    g.add(s);
+  }
+  g.traverse((o) => (o.castShadow = true));
   return g;
 }
 
-function macaron(color, mats) {
+function macaron(color, grain) {
   const g = new THREE.Group();
-  const shell = new THREE.MeshPhysicalMaterial({
-    color,
-    roughness: 0.5,
-    sheen: 0.6,
-    sheenColor: new THREE.Color('#ffffff'),
-    bumpMap: mats.grain,
-    bumpScale: 0.6,
-  });
+  const shell = new THREE.MeshPhysicalMaterial({ color, roughness: 0.5, sheen: 0.6, sheenColor: new THREE.Color('#ffffff'), bumpMap: grain, bumpScale: 0.6 });
   const dome = new THREE.SphereGeometry(0.5, 32, 16, 0, TAU, 0, Math.PI / 2);
   const top = new THREE.Mesh(dome, shell);
   top.scale.set(1, 0.42, 1);
@@ -202,10 +238,7 @@ function macaron(color, mats) {
   f1.position.y = 0.13;
   const f2 = f1.clone();
   f2.position.y = -0.13;
-  const fill = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.44, 0.44, 0.18, 40),
-    new THREE.MeshStandardMaterial({ color: '#fbefdc', roughness: 0.6 }),
-  );
+  const fill = new THREE.Mesh(new THREE.CylinderGeometry(0.44, 0.44, 0.18, 40), new THREE.MeshStandardMaterial({ color: '#fbefdc', roughness: 0.6 }));
   g.add(top, bottom, f1, f2, fill);
   return g;
 }
@@ -214,217 +247,194 @@ export function createCakeScene(canvas, { reducedMotion = false, mobile = false 
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.5 : 1.75));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.98;
+  // Neutral : couleurs fidèles à la photo (le rouge du fondant ne vire pas à l'orange).
+  renderer.toneMapping = THREE.NeutralToneMapping;
+  renderer.toneMappingExposure = 1.0;
+  renderer.shadowMap.enabled = !mobile;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
   const scene = new THREE.Scene();
   const pmrem = new THREE.PMREMGenerator(renderer);
   scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-  scene.environmentIntensity = 0.55;
+  scene.environmentIntensity = 0.7;
 
   const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
   const target = new THREE.Vector3();
 
-  scene.add(new THREE.HemisphereLight('#ffe9d6', '#4c1212', 0.7));
-  const key = new THREE.DirectionalLight('#fff1e0', 2.4);
-  key.position.set(4, 7, 6);
-  const rim = new THREE.DirectionalLight('#ffb59a', 2.2);
+  scene.add(new THREE.HemisphereLight('#fff6ec', '#d1b6a5', 0.9));
+  const key = new THREE.DirectionalLight('#fff3e6', 2.1);
+  key.position.set(3.5, 7, 5);
+  key.castShadow = true;
+  key.shadow.mapSize.set(1024, 1024);
+  key.shadow.camera.left = key.shadow.camera.bottom = -3;
+  key.shadow.camera.right = key.shadow.camera.top = 3;
+  key.shadow.camera.near = 1;
+  key.shadow.camera.far = 20;
+  key.shadow.bias = -0.0005;
+  key.shadow.radius = 6;
+  const rim = new THREE.DirectionalLight('#ffd0c4', 1.8);
   rim.position.set(-6, 3, -5);
-  const warm = new THREE.PointLight('#ffcf8a', 8, 14, 1.6);
-  warm.position.set(3, 1.5, 4);
+  const warm = new THREE.PointLight('#ffcf8a', 6, 14, 1.6);
+  warm.position.set(-3, 1.2, 4);
   scene.add(key, rim, warm);
 
   const tex = makeTextures();
-  const velvet = new THREE.MeshPhysicalMaterial({
-    color: '#e6c9b9',
-    roughness: 0.9,
-    sheen: 1,
-    sheenColor: new THREE.Color('#fff4ec'),
-    sheenRoughness: 0.4,
+  const fondant = new THREE.MeshPhysicalMaterial({
+    color: '#a8121c',
+    roughness: 0.58,
+    roughnessMap: tex.sparkle,
+    sheen: 0.45,
+    sheenColor: new THREE.Color('#ff8f8f'),
+    sheenRoughness: 0.35,
     bumpMap: tex.grain,
-    bumpScale: 0.8,
-    side: THREE.DoubleSide,
+    bumpScale: 0.35,
+    transparent: true,
   });
-  const gold = new THREE.MeshPhysicalMaterial({ color: '#f2c879', metalness: 1, roughness: 0.2, clearcoat: 0.4 });
-  const petals = new THREE.MeshPhysicalMaterial({
-    color: '#69302c',
-    roughness: 0.8,
-    sheen: 1,
-    sheenColor: new THREE.Color('#ab8275'),
-    sheenRoughness: 0.5,
-  });
+  const heartMat = new THREE.MeshPhysicalMaterial({ color: '#c01a28', roughness: 0.7, sheen: 0.5, sheenColor: new THREE.Color('#ff9d9d') });
+  const gold = new THREE.MeshPhysicalMaterial({ color: '#f0c66e', metalness: 1, roughness: 0.18, clearcoat: 0.5 });
+  const gem = new THREE.MeshPhysicalMaterial({ color: '#ffffff', metalness: 0.1, roughness: 0.02, clearcoat: 1, envMapIntensity: 3 });
 
-  const root = new THREE.Group(); // le gâteau complet, tourne sur lui-même
-  const main = new THREE.Group();
-  const slice = new THREE.Group();
-  root.add(main, slice);
+  const root = new THREE.Group(); // tout le gâteau, tourne sur lui-même
   scene.add(root);
 
-  // Plateau
-  const board = new THREE.Mesh(
-    new THREE.CylinderGeometry(R + 0.4, R + 0.42, 0.06, 96),
-    [new THREE.MeshPhysicalMaterial({ color: '#d9b26a', metalness: 1, roughness: 0.3 }), new THREE.MeshStandardMaterial({ color: '#fbefdc', roughness: 0.4 }), gold],
-  );
-  board.position.y = -0.03;
+  // Plateau carré blanc, comme sur la photo
+  const board = new THREE.Mesh(new THREE.BoxGeometry(3.9, 0.04, 3.9), new THREE.MeshStandardMaterial({ color: '#fffdf9', roughness: 0.35 }));
+  board.position.y = -0.02;
+  board.receiveShadow = true;
   root.add(board);
-  const shadow = new THREE.Mesh(
-    new THREE.PlaneGeometry(R * 4.4, R * 4.4),
-    new THREE.MeshBasicMaterial({ map: tex.shadow, transparent: true, depthWrite: false }),
-  );
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(9, 9), new THREE.MeshBasicMaterial({ map: tex.shadow, transparent: true, depthWrite: false }));
   shadow.rotation.x = -Math.PI / 2;
-  shadow.position.y = -0.065;
+  shadow.position.y = -0.045;
   scene.add(shadow);
 
-  // Couches : chaque couche existe en deux morceaux, gâteau principal et part.
+  // Couches intérieures (visibles quand le fondant se soulève)
   const layers = [];
-  const cuts = [];
   let y = 0;
-  LAYERS.forEach((L, i) => {
-    const isTop = i === LAYERS.length - 1;
-    const cut = new THREE.MeshStandardMaterial({
+  LAYERS.forEach((L) => {
+    const mat = new THREE.MeshStandardMaterial({
       color: L.color,
-      roughness: L.gloss ? 0.32 : 0.85,
+      roughness: L.gloss ? 0.3 : 0.85,
       map: L.crumb ? tex.crumb : null,
       bumpMap: L.crumb ? tex.crumb : tex.grain,
-      bumpScale: L.crumb ? 2.5 : 0.3,
-      side: THREE.DoubleSide,
+      bumpScale: L.crumb ? 2.2 : 0.3,
     });
-    const mats = { side: velvet, top: isTop ? velvet : cut, cut };
-    const baseY = y + L.h / 2;
-    const m = wedge(L.h, SLICE_START + SLICE_LEN, TAU - SLICE_LEN, mats, cuts);
-    const s = wedge(L.h, SLICE_START, SLICE_LEN, mats, cuts);
-    m.position.y = s.position.y = baseY;
-    main.add(m);
-    slice.add(s);
-    layers.push({ main: m, slice: s, baseY, h: L.h });
+    const m = new THREE.Mesh(heartSlab(INNER, L.h, 0.012), mat);
+    const baseY = y;
+    m.position.y = baseY;
+    m.receiveShadow = true;
+    root.add(m);
+    layers.push({ mesh: m, baseY, h: L.h });
     y += L.h;
   });
-  const H = y;
-  const top = layers[layers.length - 1];
-  const shells = [
-    [main, SLICE_START + SLICE_LEN, TAU - SLICE_LEN],
-    [slice, SLICE_START, SLICE_LEN],
-  ].map(([parent, start, len]) => {
-    const segs = Math.max(10, Math.round((128 * len) / TAU));
-    const m = new THREE.Mesh(new THREE.CylinderGeometry(R + 0.003, R + 0.003, H - 0.004, segs, 1, true, start, len), velvet);
-    m.position.y = H / 2;
-    parent.add(m);
-    return m;
-  });
-  const topY = top.h / 2;
 
-  const cm = collar(SLICE_START + SLICE_LEN, TAU - SLICE_LEN, velvet, gold);
-  cm.position.y = topY;
-  top.main.add(cm);
-  const cs = collar(SLICE_START, SLICE_LEN, velvet, gold);
-  cs.position.y = topY;
-  top.slice.add(cs);
+  // Le fondant : une coque qui enveloppe tout (bords arrondis), et ses décors.
+  const shell = new THREE.Group();
+  root.add(shell);
+  const bevel = 0.17; // bords bien arrondis, comme un fondant drapé
+  const body = new THREE.Mesh(heartSlab(1, H + 0.02 - bevel * 2, bevel), fondant);
+  body.position.y = bevel;
+  body.castShadow = body.receiveShadow = true;
+  shell.add(body);
+  const topY = H + 0.02;
 
-  // Cascade de fleurs sur le flanc décoré, rattachée à la couche qu'elle touche.
-  const cascade = [
-    [-0.42, 1.28, 1.0],
-    [-0.2, 1.0, 0.85],
-    [0.02, 0.72, 0.72],
-    [0.2, 0.47, 0.6],
-    [0.36, 0.25, 0.5],
-  ];
-  for (const [dt, fy, size] of cascade) {
-    const theta = DECOR_THETA + dt;
-    const fl = flower(petals, gold, size * 0.62);
-    const li = layers.findIndex((l) => fy >= l.baseY - l.h / 2 && fy <= l.baseY + l.h / 2);
-    const host = layers[li < 0 ? 0 : li].main;
-    fl.position.set(Math.sin(theta) * (R + 0.03), fy - host.position.y, Math.cos(theta) * (R + 0.03));
-    fl.lookAt(Math.sin(theta) * 10, fl.position.y, Math.cos(theta) * 10);
-    fl.rotateX(Math.PI / 2);
-    host.add(fl);
-  }
-
-  // Perles dorées posées au pied (comme le gâteau « Bonne Fête Maman »)
-  for (const [r, py, dt] of [
-    [0.26, 0.26, 0.95],
-    [0.17, 0.66, 1.0],
-    [0.11, 0.93, 1.04],
+  // Petits cœurs sur le dessus et sur les épaules du cœur
+  for (const [x, z, s, r] of [
+    [-0.95, -0.55, 0.075, 0.4],
+    [-0.35, -0.82, 0.07, -0.2],
+    [0.05, 0.62, 0.075, 0.1],
+    [-1.42, -0.1, 0.06, 0.9],
+    [1.45, -0.18, 0.06, -0.9],
   ]) {
-    const b = new THREE.Mesh(new THREE.SphereGeometry(r, 48, 32), gold);
-    const th = DECOR_THETA + dt;
-    b.position.set(Math.sin(th) * (R + r * 0.55), py, Math.cos(th) * (R + r * 0.55));
-    root.add(b);
+    const h = smallHeart(heartMat, s);
+    h.position.set(x, topY + 0.015, z);
+    h.rotation.y = r;
+    h.castShadow = true;
+    shell.add(h);
   }
-  // Perles sur le dessus, hors de la part
-  const pearl = new THREE.SphereGeometry(0.05, 20, 14);
-  for (let i = 0; i < 14; i++) {
-    const th = SLICE_LEN + 0.25 + Math.random() * (TAU - SLICE_LEN - 0.5);
-    const rr = 0.35 + Math.random() * (R - 0.55);
-    const p = new THREE.Mesh(pearl, gold);
-    p.scale.setScalar(0.6 + Math.random() * 0.9);
-    p.position.set(Math.sin(th) * rr, topY + 0.03, Math.cos(th) * rr);
-    top.main.add(p);
+  // Colonne de cœurs sur la pointe, face à la caméra
+  const tipZ = (17 - 2.5) * S + bevel;
+  for (let i = 0; i < 6; i++) {
+    const h = smallHeart(heartMat, 0.095);
+    h.rotation.x = Math.PI / 2;
+    h.position.set(0, 0.16 + i * 0.19, tipZ + 0.01);
+    h.castShadow = true;
+    shell.add(h);
   }
 
-  // Topper : le monogramme « iG » de la charte, extrudé en or.
+  // Topper « Birthday Queen » posé à plat, en léger relief (plaques superposées)
   const topper = new THREE.Group();
-  topper.position.y = H;
-  topper.rotation.y = -ROT_START;
-  root.add(topper);
-  fetch(`${import.meta.env.BASE_URL}brand/monogram.svg`)
-    .then((r) => r.text())
-    .then((svg) => {
-      const data = new SVGLoader().parse(svg);
-      const shapes = data.paths.flatMap((p) => SVGLoader.createShapes(p));
-      const geo = new THREE.ExtrudeGeometry(shapes, {
-        depth: 3,
-        bevelEnabled: true,
-        bevelThickness: 0.5,
-        bevelSize: 0.2,
-        bevelSegments: 2,
-        curveSegments: 8,
-      });
-      geo.center();
-      geo.rotateX(Math.PI);
-      const s = 2.7 / 464;
-      geo.scale(s, s, s);
-      const mono = new THREE.Mesh(geo, gold);
-      mono.position.y = 0.95;
-      topper.add(mono);
-      const stick = new THREE.CylinderGeometry(0.014, 0.014, 0.75, 8);
-      for (const x of [-0.2, 0.22]) {
-        const st = new THREE.Mesh(stick, gold);
-        st.position.set(x, 0.42, 0);
-        topper.add(st);
-      }
-    })
-    .catch(() => {});
+  const tTex = topperTexture();
+  // Un peu d'émission pour que l'or reste lisible même vu de biais
+  const tMat = new THREE.MeshPhysicalMaterial({ color: '#f3cf7c', metalness: 0.9, roughness: 0.28, emissive: '#7a5414', emissiveIntensity: 0.55, alphaMap: tTex, alphaTest: 0.5, side: THREE.DoubleSide, clearcoat: 0.4 });
+  const tGeo = new THREE.PlaneGeometry(2.1, 1.31);
+  for (let i = 0; i < 5; i++) {
+    const p = new THREE.Mesh(tGeo, tMat);
+    p.rotation.x = -Math.PI / 2;
+    p.position.y = i * 0.006;
+    p.castShadow = i === 4;
+    topper.add(p);
+  }
+  topper.position.set(-0.18, topY + 0.01, 0.12);
+  topper.rotation.y = 0.05;
+  shell.add(topper);
 
-  // Éléments flottants : macarons, perles d'or et poussière dorée.
+  const crownG = crown(gold, gem);
+  crownG.position.set(0.95, topY, -0.6);
+  crownG.rotation.set(0.05, 0.3, -0.06);
+  shell.add(crownG);
+
+  // Éléments flottants : macarons, cœurs, perles d'or et poussière dorée
   const floaters = [];
-  const macColors = ['#d1b6a5', '#ab8275', '#fbefdc', '#89564c', '#e8b4b8', '#69302c'];
-  const macPositions = [
-    [-4.2, 2.6, -2.5],
-    [4.4, 3.1, -3],
-    [-3.6, -0.4, 0.5],
-    [3.8, 0.2, 1],
-    [-1.6, 3.9, -4],
-    [2.2, 4.4, -5],
-  ];
-  macPositions.forEach((p, i) => {
-    if (mobile && i >= 4) return; // sur mobile, on dégage le titre
-    const m = macaron(macColors[i], tex);
+  const float = (obj, speed = 0.5, spin = 0.2) =>
+    floaters.push({ obj, base: obj.position.clone(), speed: speed + Math.random() * 0.4, phase: Math.random() * TAU, spin });
+  [
+    ['#d1b6a5', [-7.2, 1.2, -3.5]],
+    ['#ab8275', [5.2, 1.4, -3]],
+    ['#fbefdc', [-6.2, -0.6, 0.5]],
+    ['#e8b4b8', [4.4, -0.2, 1]],
+  ].forEach(([c, p], i) => {
+    if (mobile && i > 1) return;
+    const m = macaron(c, tex.grain);
     m.position.set(...p);
     m.scale.setScalar(0.55 + (i % 3) * 0.15);
     m.rotation.set(Math.random() * 1.2, Math.random() * TAU, Math.random() * 0.8);
     scene.add(m);
-    floaters.push({ obj: m, base: m.position.clone(), speed: 0.4 + Math.random() * 0.5, phase: Math.random() * TAU, spin: 0.15 + Math.random() * 0.2 });
+    float(m);
   });
-  for (let i = 0; i < 9; i++) {
-    const b = new THREE.Mesh(new THREE.SphereGeometry(0.08 + Math.random() * 0.14, 32, 24), gold);
-    const a = Math.random() * TAU;
-    const d = 3.2 + Math.random() * 2.5;
-    b.position.set(Math.cos(a) * d, -0.5 + Math.random() * 4.5, Math.sin(a) * d - 1.5);
+  // Positions choisies à la main : sur les côtés, jamais devant le logo ni le texte.
+  const HEARTS = [
+    [4.3, 1.9, -2.2, 0],
+    [5.9, 0.1, -1.2, 1],
+    [3.7, -0.7, 1.2, 1],
+    [-6.6, 1.4, -2.6, 0],
+    [-5.6, -0.6, 0.2, 1],
+    [6.6, 2.3, -4.2, 1],
+    [-7.4, -0.2, -3.5, 0],
+  ];
+  HEARTS.forEach(([x, y, z, red], i) => {
+    if (mobile && i > 3) return;
+    const h = smallHeart(red ? heartMat : gold, 0.17 + (i % 3) * 0.05);
+    h.position.set(x, y, z);
+    h.rotation.set(0.4 + i, i * 1.3, 0.2 * i);
+    scene.add(h);
+    float(h, 0.5, 0.4);
+  });
+  const PEARLS = [
+    [4.9, 1.0, 0.4, 0.12],
+    [3.4, 2.4, -3.0, 0.08],
+    [6.2, -0.8, -0.5, 0.16],
+    [-6.0, 2.2, -3.2, 0.1],
+    [-4.9, 0.6, 1.2, 0.07],
+    [5.4, 3.0, -5.0, 0.11],
+  ];
+  PEARLS.forEach(([x, y, z, r]) => {
+    const b = new THREE.Mesh(new THREE.SphereGeometry(r, 32, 24), gold);
+    b.position.set(x, y, z);
     scene.add(b);
-    floaters.push({ obj: b, base: b.position.clone(), speed: 0.5 + Math.random() * 0.6, phase: Math.random() * TAU, spin: 0 });
-  }
+    float(b, 0.6, 0);
+  });
 
-  const dustCount = mobile ? 160 : 380;
+  const dustCount = mobile ? 140 : 320;
   const dustPos = new Float32Array(dustCount * 3);
   for (let i = 0; i < dustCount; i++) {
     dustPos[i * 3] = (Math.random() - 0.5) * 16;
@@ -433,22 +443,12 @@ export function createCakeScene(canvas, { reducedMotion = false, mobile = false 
   }
   const dustGeo = new THREE.BufferGeometry();
   dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
-  const dust = new THREE.Points(
-    dustGeo,
-    new THREE.PointsMaterial({
-      size: 0.07,
-      map: tex.dot,
-      color: '#ffd98f',
-      transparent: true,
-      opacity: 0.85,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-    }),
-  );
+  const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({ size: 0.06, map: tex.dot, transparent: true, opacity: 0.9, depthWrite: false }));
   scene.add(dust);
 
   // ─── État piloté de l'extérieur (GSAP) ───
-  const state = { rot: ROT_START, x: 0, slice: 0, explode: 0, topper: 0, zoom: 0, fade: 0 };
+  // open : le fondant se soulève · explode : les couches se séparent · topper : couronne et topper s'envolent
+  const state = { rot: ROT_START, x: 0, open: 0, explode: 0, topper: 0, zoom: 0, fade: 0, drop: 0 };
   const pointer = { x: 0, y: 0, sx: 0, sy: 0 };
   window.addEventListener('pointermove', (e) => {
     pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
@@ -465,12 +465,11 @@ export function createCakeScene(canvas, { reducedMotion = false, mobile = false 
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     const halfTan = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
-    baseDist = Math.max(5.2 / (2 * halfTan), (camera.aspect < 0.8 ? 5.6 : 6.6) / (2 * halfTan * camera.aspect));
+    baseDist = Math.max(6.2 / (2 * halfTan), (camera.aspect < 0.8 ? 5.4 : 7.4) / (2 * halfTan * camera.aspect));
   }
   resize();
   window.addEventListener('resize', resize);
 
-  const sliceDir = new THREE.Vector3(Math.sin(SLICE_DIR), 0, Math.cos(SLICE_DIR));
   const tmp = new THREE.Vector3();
   const clock = new THREE.Clock();
   let running = true;
@@ -481,29 +480,31 @@ export function createCakeScene(canvas, { reducedMotion = false, mobile = false 
     pointer.sx += (pointer.x - pointer.sx) * 0.05;
     pointer.sy += (pointer.y - pointer.sy) * 0.05;
 
-    root.rotation.y = state.rot + Math.sin(t * 0.35) * 0.08 * idle + pointer.sx * 0.12;
+    root.rotation.y = state.rot + Math.sin(t * 0.35) * 0.1 * idle + pointer.sx * 0.15;
     root.rotation.x = pointer.sy * 0.04;
-    // state.x est exprimé en fraction de la demi-largeur visible : indépendant de l'écran.
-    const dist = baseDist * (1 - state.zoom * 0.12) + state.explode * 2.2;
+    root.position.y = state.drop * 4;
+
+    const dist = baseDist * (1 - state.zoom * 0.12) + state.explode * 2;
     const halfW = dist * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect;
     root.position.x = state.x * halfW;
     shadow.position.x = root.position.x;
+    shadow.material.opacity = 1 - state.drop;
 
-    const spread = 0.42;
-    layers.forEach((l, i) => {
-      l.main.position.y = l.baseY + state.explode * i * spread;
-      l.slice.position.y = l.baseY + state.explode * i * spread;
-    });
-    const assembled = state.explode < 0.002;
-    shells.forEach((m) => (m.visible = assembled));
-    const opened = !assembled || state.slice > 0.002;
-    cuts.forEach((c) => (c.visible = opened));
-    slice.position.copy(sliceDir).multiplyScalar(state.slice * 1.25);
-    slice.position.y = state.slice * 0.22 - state.explode * 0.15;
-    slice.rotation.y = state.slice * 0.18;
+    const spread = 0.38;
+    layers.forEach((l, i) => (l.mesh.position.y = l.baseY + state.explode * i * spread));
 
-    topper.position.y = H + state.topper * 3.2;
-    topper.visible = state.topper < 0.99;
+    // Le fondant monte et s'efface pour dévoiler l'intérieur
+    shell.position.y = state.open * 3.2 + state.explode * LAYERS.length * spread;
+    fondant.opacity = 1 - THREE.MathUtils.smoothstep(state.open, 0.35, 0.85);
+    fondant.depthWrite = fondant.opacity > 0.99;
+    shell.visible = fondant.opacity > 0.01;
+
+    // Couronne et topper s'envolent en tournant
+    crownG.position.y = topY + state.topper * 2.6;
+    crownG.rotation.y = 0.3 + state.topper * 3;
+    topper.position.y = topY + 0.01 + state.topper * 1.8;
+    topper.rotation.z = state.topper * 0.6;
+    crownG.visible = topper.visible = state.topper < 0.98;
 
     floaters.forEach((f) => {
       f.obj.position.y = f.base.y + Math.sin(t * f.speed + f.phase) * 0.25 * idle;
@@ -512,10 +513,10 @@ export function createCakeScene(canvas, { reducedMotion = false, mobile = false 
     dust.rotation.y = t * 0.02 * idle;
     dust.position.y = Math.sin(t * 0.2) * 0.2 * idle;
 
-    // Sur écran vertical, on remonte le gâteau pour laisser la place au texte en bas.
-    const lift = camera.aspect < 0.8 ? -1.1 : 0;
-    const lookY = 0.8 + state.explode * 1.1 + lift;
-    camera.position.set(pointer.sx * 0.5, lookY + 1.6 + state.explode * 0.4 - pointer.sy * 0.3, dist);
+    // Sur écran vertical, le gâteau remonte pour laisser la place au texte en bas.
+    const lift = camera.aspect < 0.8 ? -0.7 : 0.6;
+    const lookY = 0.7 + state.explode * 1.1 + lift - state.open * 0.4;
+    camera.position.set(pointer.sx * 0.5, lookY + 3.4 - state.explode * 0.6 - pointer.sy * 0.3, dist);
     target.set(0, lookY, 0);
     camera.lookAt(target);
     canvas.style.opacity = String(1 - state.fade);
@@ -531,11 +532,12 @@ export function createCakeScene(canvas, { reducedMotion = false, mobile = false 
   requestAnimationFrame(loop);
 
   // Position écran (px) du bord droit d'une couche — sert aux étiquettes HTML.
+  const right = new THREE.Vector3();
   function layerAnchor(i) {
     const l = layers[i];
-    l.main.updateWorldMatrix(true, false);
-    tmp.setFromMatrixPosition(l.main.matrixWorld);
-    tmp.x += R + 0.12 + state.slice * 0.95;
+    l.mesh.updateWorldMatrix(true, false);
+    right.setFromMatrixColumn(camera.matrixWorld, 0); // direction « droite » de la caméra
+    tmp.set(0, l.h / 2, 0).applyMatrix4(l.mesh.matrixWorld).addScaledVector(right, 1.75);
     tmp.project(camera);
     return { x: (tmp.x * 0.5 + 0.5) * width, y: (-tmp.y * 0.5 + 0.5) * height };
   }

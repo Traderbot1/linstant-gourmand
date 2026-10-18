@@ -5,3 +5,5 @@ dist
 photos/*
 !photos/LISEZ-MOI.txt
 creations/*/
+research_notes/
+reports/

@@ -6,9 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#4c1212" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Italiana&family=Pinyon+Script&family=Tenor+Sans&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/src/css/main.css" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://linstantg.com/img/gateau-velours-violet.jpg" />
@@ -75,7 +72,11 @@
         </div>
         <div class="atelier-map__map">
           <span class="atelier-map__label">L’atelier</span>
-          <iframe src="https://www.google.com/maps?q=La+Garenne-Colombes,92250&amp;output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" title="L’atelier L’instant Gourmand à La Garenne-Colombes"></iframe>
+          <!-- La carte Google n'est chargée qu'au clic : aucun cookie tiers sans l'accord du visiteur (RGPD). -->
+          <button class="map-consent" type="button" data-map="https://www.google.com/maps?q=La+Garenne-Colombes,92250&amp;output=embed">
+            <span class="map-consent__title">Afficher la carte</span>
+            <span class="map-consent__text">La carte est fournie par Google Maps, qui peut déposer des cookies.</span>
+          </button>
         </div>
       </section>
 

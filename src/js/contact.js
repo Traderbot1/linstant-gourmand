@@ -39,3 +39,13 @@ form.querySelector('[data-email]').addEventListener('click', () => {
   openEmail(`${form.sujet.value} — ${form.prenom.value} ${form.nom.value}`, message());
   note.textContent = 'Votre messagerie s’ouvre avec le message pré-rempli. Merci !';
 });
+
+// Carte Google chargée seulement à la demande
+document.querySelector('[data-map]')?.addEventListener('click', (e) => {
+  const btn = e.currentTarget;
+  const iframe = document.createElement('iframe');
+  iframe.src = btn.dataset.map;
+  iframe.title = 'L’atelier L’instant Gourmand à La Garenne-Colombes';
+  iframe.referrerPolicy = 'no-referrer-when-downgrade';
+  btn.replaceWith(iframe);
+});

@@ -1,18 +1,25 @@
 import { initCommon, gsap, ScrollTrigger, reducedMotion, isTouch, lenis, session } from './common.js';
-import { createCakeScene, LAYERS, ROT_REVEAL } from './cake-scene.js';
 
 initCommon();
 
 const mobile = window.matchMedia('(max-width: 760px)').matches;
 const canvas = document.querySelector('.webgl');
 
+// La 3D (Three.js) est chargée à part, après l'affichage de la page : le texte et le logo
+// s'affichent tout de suite, le gâteau arrive ensuite en douceur.
 let scene = null;
-try {
-  scene = createCakeScene(canvas, { reducedMotion, mobile });
-} catch (err) {
-  console.warn('WebGL indisponible, affichage simplifié.', err);
-  document.documentElement.classList.add('no-webgl');
-}
+let cake = null;
+const sceneReady = import('./cake-scene.js')
+  .then((mod) => {
+    cake = mod;
+    scene = mod.createCakeScene(canvas, { reducedMotion, mobile });
+    Object.assign(scene.state, { fade: 1, drop: reducedMotion ? 0 : 1 });
+    if (reducedMotion) scene.state.fade = 0;
+  })
+  .catch((err) => {
+    console.warn('WebGL indisponible, affichage simplifié.', err);
+    document.documentElement.classList.add('no-webgl');
+  });
 
 // ─── Préchargement (une fois par session) ───
 function runLoader() {
@@ -44,16 +51,22 @@ function runLoader() {
 function heroIntro() {
   if (reducedMotion) return;
   const tl = gsap.timeline();
-  tl.from('.hero__word path', { yPercent: 40, opacity: 0, duration: 1.6, stagger: 0.035, ease: 'expo.out' }, 0.1)
+  tl.fromTo('.hero__logo', { clipPath: 'inset(0 100% 0 0)', y: 20 }, { clipPath: 'inset(0 0% 0 0)', y: 0, duration: 1.8, ease: 'power3.inOut' }, 0.1)
     .from('[data-hero-in]', { y: 30, opacity: 0, duration: 1.2, stagger: 0.12, ease: 'expo.out' }, 0.5)
     .from('.scroll-hint', { opacity: 0, duration: 1 }, 1);
-  if (scene) tl.fromTo(scene.state, { fade: 1, zoom: -1.2 }, { fade: 0, zoom: 0, duration: 2.2, ease: 'expo.out' }, 0);
+}
+
+// Le gâteau descend se poser sur son plateau
+function cakeIntro() {
+  if (!scene || reducedMotion) return;
+  gsap.fromTo(scene.state, { fade: 1, zoom: -0.8, drop: 1 }, { fade: 0, zoom: 0, drop: 0, duration: 2.4, ease: 'expo.out', delay: 0.2 });
 }
 
 // ─── Histoire 3D pilotée par le scroll ───
 function initStory() {
   const steps = gsap.utils.toArray('.story__step');
   if (!scene) return;
+  const { LAYERS, ROT_START, ROT_REVEAL } = cake;
   const S = scene.state;
   const xRight = mobile ? 0 : 0.36;
 
@@ -92,18 +105,18 @@ function initStory() {
   tl.to(S, { topper: 1, duration: 1.4, ease: 'power2.in' }, 0)
     .to(S, { rot: ROT_REVEAL, duration: 3 }, 0)
     .to(S, { x: xRight, duration: 2.2 }, 0.8)
-    .to('.hero__word', { yPercent: -60, opacity: 0, duration: 1.6, ease: 'none' }, 0)
+    .to('.hero__logo', { yPercent: -80, opacity: 0, duration: 1.6, ease: 'none' }, 0)
     .to(steps[0], stepIn(), 1.7)
     .to(steps[0], stepOut, 3.1)
-    .to(S, { slice: 1, zoom: 1, duration: 1.4, ease: 'power3.out' }, 3.1)
+    .to(S, { open: 1, zoom: 1, duration: 1.4, ease: 'power2.inOut' }, 3.1)
     .to(steps[1], stepIn(), 3.6)
     .to(steps[1], stepOut, 5)
-    .to(S, { explode: 1, slice: 0.45, x: mobile ? -0.3 : 0.1, zoom: 0.4, rot: ROT_REVEAL + 0.25, duration: 1.8 }, 5.1)
+    .to(S, { explode: 1, x: mobile ? -0.3 : 0.1, zoom: 0.4, rot: ROT_REVEAL + 0.25, duration: 1.8 }, 5.1)
     .to(labelState, { o: 1, duration: 1 }, 6.1)
     .to(steps[2], stepIn(), 5.6)
     .to(steps[2], stepOut, 7.6)
     .to(labelState, { o: 0, duration: 0.5 }, 7.6)
-    .to(S, { explode: 0, slice: 0, zoom: 0, x: xRight, rot: ROT_REVEAL + 2 * Math.PI * 0.25, duration: 1.6 }, 7.8)
+    .to(S, { explode: 0, open: 0, topper: 0, zoom: 0, x: xRight, rot: ROT_START + 2 * Math.PI, duration: 1.6 }, 7.8)
     .to(steps[3], stepIn(), 8.4)
     .to('.story__progress i', { scaleY: 1, duration: 10, ease: 'none' }, 0)
     .to({}, { duration: 0.6 }, 9.4);
@@ -190,9 +203,15 @@ function initDraw() {
   });
 }
 
-initStory();
 initShowcase();
 initTilt();
 initDraw();
-runLoader().then(heroIntro);
+const loaded = runLoader();
+loaded.then(heroIntro);
+Promise.all([loaded, sceneReady]).then(() => {
+  initStory();
+  cakeIntro();
+  ScrollTrigger.sort();
+  ScrollTrigger.refresh();
+});
 window.addEventListener('load', () => ScrollTrigger.refresh());

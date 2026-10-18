@@ -65,7 +65,7 @@ export function header() {
 <div class="curtain" aria-hidden="true"></div>
 <div class="cursor" aria-hidden="true"><div class="cursor__dot"></div><div class="cursor__ring"><span></span></div></div>
 <header class="header" data-header>
-  <a class="header__logo" href="/" aria-label="L’instant Gourmand — accueil">${svg('wordmark', 'aria-hidden="true"')}</a>
+  <a class="header__logo" href="/" aria-label="L’instant Gourmand — accueil"><span class="brand-logo" aria-hidden="true"></span></a>
   <nav class="nav" aria-label="Navigation principale">
     <div class="nav__links">
       <a class="link-line" href="/" data-nav="home">Accueil</a>
@@ -123,7 +123,7 @@ export function footer() {
   <div class="wrap">
     <div class="footer__grid">
       <div>
-        <div class="footer__logo">${svg('logo', 'aria-hidden="true"')}</div>
+        <div class="footer__logo"><span class="brand-logo" role="img" aria-label="L’instant Gourmand — Douceur &amp; Saveur"></span></div>
         <p class="muted" style="max-width:28em;margin:24px 0">Pâtisserie franco-tunisienne d’exception, sur commande. Créations sucrées et salées imaginées par <em class="script" style="font-size:1.35em">${CONTACT.chef}</em> dans son atelier de ${CONTACT.city}.</p>
         ${socialIcons()}
       </div>
@@ -141,7 +141,7 @@ export function footer() {
         <li class="muted">${CONTACT.hours}</li>
       </ul></div>
     </div>
-    <div class="footer__big" aria-hidden="true">${svg('wordmark')}</div>
+    <div class="footer__big" aria-hidden="true"><span class="brand-logo brand-logo--word"></span></div>
     <div class="footer__bottom">
       <span>© <span data-year>2026</span> L’instant Gourmand — Douceur &amp; Saveur · Tous droits réservés</span>
       <span>Fait avec amour sur Paris par <a class="link-line" href="https://agenticflow.fr" target="_blank" rel="noopener">agenticflow.fr</a></span>
