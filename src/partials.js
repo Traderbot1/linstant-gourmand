@@ -144,7 +144,7 @@ export function footer() {
     <div class="footer__big" aria-hidden="true"><span class="brand-logo brand-logo--word"></span></div>
     <div class="footer__bottom">
       <span>© <span data-year>2026</span> L’instant Gourmand — Douceur &amp; Saveur · Tous droits réservés</span>
-      <span class="made-with">Fait avec <svg class="heartbeat" viewBox="0 0 24 24" fill="currentColor" role="img" aria-label="amour"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> sur Paris par <a class="link-line" href="https://agenticflow.fr" target="_blank" rel="noopener">agenticflow.fr</a></span>
+      <span class="made-with">Fait avec <span class="heart3d" role="img" aria-label="amour"><span class="heart3d__strip"></span></span> par <a class="link-line" href="https://agenticflow.fr" target="_blank" rel="noopener">agenticflow.fr</a></span>
     </div>
   </div>
 </footer>`;

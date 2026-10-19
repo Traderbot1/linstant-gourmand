@@ -260,19 +260,19 @@ function initReveals() {
   });
 }
 
-// Le badge « Fait main » tourne plus vite quand on fait défiler la page
+// Le badge « Fait main » tourne en continu (GSAP) et accélère doucement pendant le défilement
 function initSeals() {
   const rings = [...document.querySelectorAll('.seal__ring')];
   if (!rings.length || reducedMotion) return;
-  let timer;
-  const rate = (r) => rings.forEach((el) => el.getAnimations().forEach((a) => (a.playbackRate = r)));
+  const spin = gsap.to(rings, { rotation: 360, transformOrigin: '50% 50%', duration: 20, ease: 'none', repeat: -1 });
   ScrollTrigger.create({
     start: 0,
     end: 'max',
     onUpdate: (self) => {
-      rate(1 + Math.min(Math.abs(self.getVelocity()) / 250, 10));
-      clearTimeout(timer);
-      timer = setTimeout(() => rate(1), 180);
+      const v = Math.abs(self.getVelocity());
+      if (!Number.isFinite(v)) return;
+      gsap.to(spin, { timeScale: 1 + Math.min(v / 400, 5), duration: 0.25, overwrite: true });
+      gsap.to(spin, { timeScale: 1, duration: 1.2, delay: 0.3, ease: 'power2.out' });
     },
   });
 }
