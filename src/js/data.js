@@ -7,6 +7,8 @@
 // ─────────────────────────────────────────────────────────────
 export const CREATIONS = [
   // Gâteaux (featured: true = mis en avant sur l’accueil)
+  { id: 'birthday-queen', title: 'Birthday Queen', category: 'gateaux', tag: 'Anniversaire', description: 'Cœur rouge, couronne dorée et lettrage « Queen ».', image: 'gateau-birthday-queen', featured: true },
+  { id: 'maison-de-luxe', title: 'Maison de luxe', category: 'gateaux', tag: 'Anniversaire', description: 'Orange iconique, sac et ceinture en sucre pour un 40e anniversaire.', image: 'gateau-maison-de-luxe', featured: true },
   { id: 'velours-violet', title: 'Velours Améthyste', category: 'gateaux', tag: 'Anniversaire', description: 'Finition velours lavande, col déchiré et cascade de fleurs pailletées d’or.', image: 'gateau-velours-violet', featured: true },
   { id: 'maison-noel', title: 'Maison de Noël', category: 'gateaux', tag: 'Fêtes', description: 'Façade de maison en sucre, sapins, lanternes et couronne de Noël.', image: 'gateau-maison-noel', featured: true },
   { id: 'vintage-rubans', title: 'Vintage aux rubans', category: 'gateaux', tag: 'Anniversaire', description: 'Style vintage, poches de crème et nœuds de satin rose, présenté dans sa boîte.', image: 'gateau-vintage-rubans' },
@@ -23,7 +25,6 @@ export const CREATIONS = [
   { id: 'best-dad', title: 'Best Dad', category: 'gateaux', tag: 'Fêtes', description: 'Costume bleu, nœud papillon et boutons dorés pour la fête des pères.', image: 'gateau-best-dad' },
   { id: 'halloween', title: 'Halloween', category: 'gateaux', tag: 'Fêtes', description: 'Orange citrouille, sorcière, maison hantée et arbres noirs.', image: 'gateau-halloween' },
   { id: 'sous-l-ocean', title: 'Sous l’océan', category: 'gateaux', tag: 'Enfants', description: 'Crabe, poulpe, coquillages et vagues colorées.', image: 'gateau-sous-l-ocean' },
-  { id: 'birthday-queen', title: 'Birthday Queen', category: 'gateaux', tag: 'Anniversaire', description: 'Cœur rouge, couronne dorée et lettrage « Queen ».', image: 'gateau-birthday-queen', featured: true },
   { id: 'ourson-pastel', title: 'Ourson pastel', category: 'gateaux', tag: 'Naissance', description: 'Vert d’eau, ourson en sucre, étoiles et papillons.', image: 'gateau-ourson-pastel' },
   { id: 'pop-stars', title: 'Pop stars', category: 'gateaux', tag: 'Enfants', description: 'Rose bonbon, chanteuses en topper et accessoires de scène.', image: 'gateau-pop-stars' },
   { id: 'chantier', title: 'Le chantier', category: 'gateaux', tag: 'Enfants', description: 'Pelleteuse, grue et rubalise pour un 2e anniversaire.', image: 'gateau-chantier' },
@@ -31,7 +32,6 @@ export const CREATIONS = [
   { id: 'plumes-roses', title: 'Plumes roses', category: 'gateaux', tag: 'Anniversaire', description: 'Crème vanille, poches rosées, rubans et topper plume.', image: 'gateau-plumes-roses' },
   { id: 'reine-des-neiges', title: 'Reine des neiges', category: 'gateaux', tag: 'Enfants', description: 'Princesse des glaces, flocons et étoiles en sucre.', image: 'gateau-reine-des-neiges' },
   { id: 'super-heros', title: 'Super-héros', category: 'gateaux', tag: 'Enfants', description: 'Gratte-ciel, toile d’araignée et héros masqué.', image: 'gateau-super-heros', featured: true },
-  { id: 'maison-de-luxe', title: 'Maison de luxe', category: 'gateaux', tag: 'Anniversaire', description: 'Orange iconique, sac et ceinture en sucre pour un 40e anniversaire.', image: 'gateau-maison-de-luxe', featured: true },
   { id: 'train-des-animaux', title: 'Le train des animaux', category: 'gateaux', tag: 'Naissance', description: 'Locomotive, tronc en chocolat et petits wagons d’animaux.', image: 'gateau-train-des-animaux' },
   { id: 'premiere-bougie', title: 'Première bougie', category: 'gateaux', tag: 'Enfants', description: 'Style vintage, crème et rubans roses pour fêter un premier anniversaire.', image: 'gateau-premiere-bougie' },
   { id: 'baby', title: 'Baby', category: 'gateaux', tag: 'Naissance', description: 'Cubes « BABY », ourson et sphères chocolat pour une baby shower.', image: 'gateau-baby', featured: true },

@@ -188,27 +188,38 @@ function initMagnetic() {
   });
 }
 
-// Transition rideau entre les pages
+// Transition rideau entre les pages (ordinateur uniquement : sur mobile, navigation directe).
+// La position du rideau est entièrement gérée ici (jamais par le CSS) et un filet de sécurité
+// le retire toujours, quoi qu'il arrive.
 function initTransitions() {
   const curtain = document.querySelector('.curtain');
   if (!curtain) return;
+  const hide = () => gsap.set(curtain, { y: 0, yPercent: 100, visibility: 'hidden' });
+  hide();
   if (session.get('ig-curtain')) {
     session.remove('ig-curtain');
-    gsap.set(curtain, { yPercent: 0 });
-    gsap.to(curtain, { yPercent: -100, duration: 1, ease: 'expo.inOut', delay: 0.05 });
+    gsap.fromTo(
+      curtain,
+      { y: 0, yPercent: 0, visibility: 'visible' },
+      { yPercent: -100, duration: 0.9, ease: 'expo.inOut', delay: 0.05, onComplete: hide },
+    );
+    setTimeout(hide, 1600);
   }
-  if (reducedMotion) return;
+  window.addEventListener('pageshow', hide);
+  if (reducedMotion || isTouch) return;
   document.addEventListener('click', (e) => {
     const a = e.target.closest('a[href]');
-    if (!a || e.metaKey || e.ctrlKey || e.shiftKey || a.target === '_blank' || a.hasAttribute('download')) return;
+    if (!a || e.defaultPrevented || e.metaKey || e.ctrlKey || e.shiftKey || a.target === '_blank' || a.hasAttribute('download')) return;
     const url = new URL(a.href, location.href);
     if (url.origin !== location.origin || url.pathname === location.pathname) return;
     e.preventDefault();
     session.set('ig-curtain', '1');
-    gsap.fromTo(curtain, { yPercent: 100 }, { yPercent: 0, duration: 0.7, ease: 'expo.inOut', onComplete: () => (location.href = url.href) });
+    gsap.fromTo(
+      curtain,
+      { y: 0, yPercent: 100, visibility: 'visible' },
+      { yPercent: 0, duration: 0.6, ease: 'expo.inOut', onComplete: () => (location.href = url.href) },
+    );
   });
-  // Retour arrière depuis le cache : on retire le rideau
-  window.addEventListener('pageshow', (e) => e.persisted && gsap.set(curtain, { yPercent: 100 }));
 }
 
 // Apparitions au scroll
@@ -249,6 +260,23 @@ function initReveals() {
   });
 }
 
+// Le badge « Fait main » tourne plus vite quand on fait défiler la page
+function initSeals() {
+  const rings = [...document.querySelectorAll('.seal__ring')];
+  if (!rings.length || reducedMotion) return;
+  let timer;
+  const rate = (r) => rings.forEach((el) => el.getAnimations().forEach((a) => (a.playbackRate = r)));
+  ScrollTrigger.create({
+    start: 0,
+    end: 'max',
+    onUpdate: (self) => {
+      rate(1 + Math.min(Math.abs(self.getVelocity()) / 250, 10));
+      clearTimeout(timer);
+      timer = setTimeout(() => rate(1), 180);
+    },
+  });
+}
+
 export function initCommon() {
   initScroll();
   initHeader();
@@ -258,6 +286,7 @@ export function initCommon() {
   initMagnetic();
   initTransitions();
   initReveals();
+  initSeals();
   document.querySelectorAll('[data-year]').forEach((el) => (el.textContent = new Date().getFullYear()));
 }
 

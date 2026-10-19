@@ -34,6 +34,13 @@ function runLoader() {
   const count = loader.querySelector('.loader__count');
   const n = { v: 0 };
   return new Promise((resolve) => {
+    // Filet de sécurité : l'écran de chargement ne peut jamais rester affiché
+    setTimeout(() => {
+      if (!loader.isConnected) return;
+      loader.remove();
+      lenis?.start();
+      resolve();
+    }, 5000);
     gsap
       .timeline({
         onComplete: () => {
@@ -86,10 +93,13 @@ function initStory() {
       labels.forEach((l) => (l.el.style.opacity = '0'));
       return;
     }
+    const narrow = window.innerWidth < 760;
     labels.forEach((l, k) => {
-      const p = scene.layerAnchor(l.i);
+      // Sur téléphone : pastille centrée sur la couche (toujours entièrement visible)
+      const p = narrow ? scene.layerAnchor(l.i, 0) : scene.layerAnchor(l.i);
       const o = gsap.utils.clamp(0, 1, labelState.o * labels.length - (labels.length - 1 - k) * 0.6);
-      l.el.style.transform = `translate(${p.x + 14}px, ${p.y}px)`;
+      l.el.classList.toggle('is-center', narrow);
+      l.el.style.transform = `translate(${narrow ? p.x : p.x + 10}px, ${p.y}px)`;
       l.el.style.opacity = String(o);
     });
   });
@@ -111,7 +121,7 @@ function initStory() {
     .to(S, { open: 1, zoom: 1, duration: 1.4, ease: 'power2.inOut' }, 3.1)
     .to(steps[1], stepIn(), 3.6)
     .to(steps[1], stepOut, 5)
-    .to(S, { explode: 1, x: mobile ? -0.3 : 0.1, zoom: 0.4, rot: ROT_REVEAL + 0.25, duration: 1.8 }, 5.1)
+    .to(S, { explode: 1, x: mobile ? 0 : 0.1, zoom: 0.4, rot: ROT_REVEAL + 0.25, duration: 1.8 }, 5.1)
     .to(labelState, { o: 1, duration: 1 }, 6.1)
     .to(steps[2], stepIn(), 5.6)
     .to(steps[2], stepOut, 7.6)

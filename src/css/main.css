@@ -566,7 +566,7 @@ button {
   inset: 0;
   z-index: 99;
   background: var(--bordeaux-900);
-  transform: translateY(100%);
+  visibility: hidden; /* positionné uniquement par JS (common.js) */
   pointer-events: none;
 }
 
@@ -1186,23 +1186,109 @@ button {
   left: 40%;
   top: 34%;
   width: clamp(96px, 10vw, 140px);
+  z-index: 2;
+}
+/* Badge rotatif « Fait main · Sur commande » */
+.seal {
+  position: relative;
+  width: 100%;
   aspect-ratio: 1;
   border-radius: 50%;
-  background: var(--bordeaux-900);
-  color: var(--creme);
   display: grid;
   place-items: center;
-  z-index: 2;
-  box-shadow: 0 20px 40px -10px rgba(46, 9, 9, 0.5);
+  background: var(--bordeaux-900);
+  color: var(--creme);
+  box-shadow: 0 20px 40px -10px rgba(46, 9, 9, 0.45);
 }
-.atelier__seal svg.ring {
+.seal--light {
+  background: var(--creme);
+  color: var(--bordeaux-900);
+}
+.seal--gold {
+  background: transparent;
+  color: var(--gold-2);
+  box-shadow: inset 0 0 0 1px rgba(242, 213, 154, 0.35);
+}
+.seal__ring {
   position: absolute;
   inset: 6px;
   width: calc(100% - 12px);
   animation: spin 22s linear infinite;
 }
-.atelier__seal .seal-mono {
+.seal__mono {
   width: 62%;
+}
+.seal__mono svg {
+  width: 100%;
+  height: auto;
+}
+.hero__seal {
+  position: absolute;
+  z-index: 3;
+  right: var(--gutter);
+  top: 50%;
+  width: clamp(84px, 9vw, 130px);
+}
+.page-hero__seal {
+  position: absolute;
+  z-index: 2;
+  right: var(--gutter);
+  bottom: clamp(30px, 6vw, 80px);
+  width: clamp(84px, 9vw, 130px);
+}
+.footer__brand {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+.footer__brand .seal {
+  flex: none;
+  width: 96px;
+}
+.footer__brand .footer__logo {
+  flex: 1;
+  min-width: 0;
+}
+/* Cœur qui bat dans le pied de page */
+.made-with {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.heartbeat {
+  width: 16px;
+  height: 16px;
+  color: #e24b4a;
+  filter: drop-shadow(0 0 6px rgba(226, 75, 74, 0.45));
+  animation: heartbeat 1.2s ease-in-out infinite;
+  transform-origin: center;
+}
+@keyframes heartbeat {
+  0%,
+  28%,
+  70%,
+  100% {
+    transform: scale(1);
+  }
+  14% {
+    transform: scale(1.35);
+  }
+  42% {
+    transform: scale(1.22);
+  }
+}
+@media (max-width: 760px) {
+  .hero__seal {
+    top: auto;
+    bottom: 200px;
+    width: 78px;
+  }
+  .page-hero__seal {
+    top: calc(var(--header-h) + 18px);
+    bottom: auto;
+    width: 78px;
+  }
 }
 @keyframes spin {
   to {
@@ -2505,4 +2591,30 @@ button {
 .map-consent:hover .map-consent__title {
   text-decoration: underline;
   text-underline-offset: 6px;
+}
+
+/* Étiquettes des couches sur téléphone : pastille centrée sur la couche */
+.label3d.is-center {
+  translate: -50% -50%;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(251, 239, 220, 0.92);
+  box-shadow: 0 6px 20px -8px rgba(76, 18, 18, 0.4);
+  font-size: 0.58rem;
+  letter-spacing: 0.16em;
+}
+.label3d.is-center::before {
+  display: none;
+}
+.label3d.is-center span {
+  padding: 0;
+  border: 0;
+}
+@media (max-width: 760px) {
+  .hero__seal {
+    top: calc(var(--header-h) + 130px);
+    bottom: auto;
+    right: 14px;
+    width: 64px;
+  }
 }

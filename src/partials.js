@@ -123,7 +123,7 @@ export function footer() {
   <div class="wrap">
     <div class="footer__grid">
       <div>
-        <div class="footer__logo"><span class="brand-logo" role="img" aria-label="L’instant Gourmand — Douceur &amp; Saveur"></span></div>
+        <div class="footer__brand"><div class="footer__logo"><span class="brand-logo" role="img" aria-label="L’instant Gourmand — Douceur &amp; Saveur"></span></div>${seal('gold')}</div>
         <p class="muted" style="max-width:28em;margin:24px 0">Pâtisserie franco-tunisienne d’exception, sur commande. Créations sucrées et salées imaginées par <em class="script" style="font-size:1.35em">${CONTACT.chef}</em> dans son atelier de ${CONTACT.city}.</p>
         ${socialIcons()}
       </div>
@@ -144,7 +144,7 @@ export function footer() {
     <div class="footer__big" aria-hidden="true"><span class="brand-logo brand-logo--word"></span></div>
     <div class="footer__bottom">
       <span>© <span data-year>2026</span> L’instant Gourmand — Douceur &amp; Saveur · Tous droits réservés</span>
-      <span>Fait avec amour sur Paris par <a class="link-line" href="https://agenticflow.fr" target="_blank" rel="noopener">agenticflow.fr</a></span>
+      <span class="made-with">Fait avec <svg class="heartbeat" viewBox="0 0 24 24" fill="currentColor" role="img" aria-label="amour"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> sur Paris par <a class="link-line" href="https://agenticflow.fr" target="_blank" rel="noopener">agenticflow.fr</a></span>
     </div>
   </div>
 </footer>`;
@@ -319,6 +319,16 @@ export function socialCards() {
   return `
 <a class="social-card reveal-up" href="${CONTACT.instagram}" target="_blank" rel="noopener"><span class="channel__icon">${ICONS.instagram}</span><span><small>Instagram</small><b>L’instant Gourmand</b><span>${CONTACT.instagramHandle}</span></span></a>
 <a class="social-card reveal-up" href="${CONTACT.facebook}" target="_blank" rel="noopener"><span class="channel__icon">${ICONS.facebook}</span><span><small>Facebook</small><b>L’instant Gourmand</b><span>${CONTACT.facebookHandle}</span></span></a>`;
+}
+
+// Badge rotatif « Fait main · Sur commande » (affiché à plusieurs endroits du site)
+let sealCount = 0;
+export function seal(variant = 'dark') {
+  const id = `seal-path-${++sealCount}`;
+  return `<div class="seal seal--${variant}" aria-hidden="true">
+  <svg class="seal__ring" viewBox="0 0 100 100"><defs><path id="${id}" d="M50 50m-38 0a38 38 0 1 1 76 0a38 38 0 1 1-76 0"/></defs><text font-size="9" fill="currentColor" font-family="Tenor Sans, sans-serif" textLength="236" lengthAdjust="spacing"><textPath href="#${id}">FAIT MAIN · SUR COMMANDE ·</textPath></text></svg>
+  <div class="seal__mono">${svg('monogram')}</div>
+</div>`;
 }
 
 export const SVG = { logo: () => svg('logo'), wordmark: () => svg('wordmark'), monogram: () => svg('monogram') };

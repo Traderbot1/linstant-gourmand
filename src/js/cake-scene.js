@@ -484,7 +484,8 @@ export function createCakeScene(canvas, { reducedMotion = false, mobile = false 
     root.rotation.x = pointer.sy * 0.04;
     root.position.y = state.drop * 4;
 
-    const dist = baseDist * (1 - state.zoom * 0.12) + state.explode * 2;
+    // Sur téléphone, on recule davantage pendant l'éclaté pour laisser la place aux étiquettes
+    const dist = baseDist * (1 - state.zoom * 0.12) + state.explode * (camera.aspect < 0.8 ? 3 : 2);
     const halfW = dist * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.aspect;
     root.position.x = state.x * halfW;
     shadow.position.x = root.position.x;
@@ -533,11 +534,11 @@ export function createCakeScene(canvas, { reducedMotion = false, mobile = false 
 
   // Position écran (px) du bord droit d'une couche — sert aux étiquettes HTML.
   const right = new THREE.Vector3();
-  function layerAnchor(i) {
+  function layerAnchor(i, side = 1) {
     const l = layers[i];
     l.mesh.updateWorldMatrix(true, false);
     right.setFromMatrixColumn(camera.matrixWorld, 0); // direction « droite » de la caméra
-    tmp.set(0, l.h / 2, 0).applyMatrix4(l.mesh.matrixWorld).addScaledVector(right, 1.75);
+    tmp.set(0, l.h / 2, 0).applyMatrix4(l.mesh.matrixWorld).addScaledVector(right, 1.75 * side);
     tmp.project(camera);
     return { x: (tmp.x * 0.5 + 0.5) * width, y: (-tmp.y * 0.5 + 0.5) * height };
   }
