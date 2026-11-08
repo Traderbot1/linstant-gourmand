@@ -41,6 +41,10 @@ Le dossier `dist/` est un site statique : il s’héberge partout (Vercel, Netli
 
 **Ajouter une création** : ajouter une entrée dans `src/js/data.js` (titre, section, étiquette, description, nom de photo ; `featured: true` pour la mettre en avant sur l’accueil). Elle apparaît automatiquement dans la galerie, le formulaire de commande, et — si elle a une photo — dans la vitrine de l’accueil et l’aperçu du menu.
 
+## Aperçus sur les réseaux sociaux
+
+Quand on partage un lien du site (WhatsApp, Facebook, Instagram, LinkedIn, X), l’aperçu affiche une image de marque propre à chaque page (`public/og/<page>.jpg`, 1200 × 630), un titre et une description. Textes, titres et photos de ces images : `src/og.js`. Pour les régénérer : `npm run og` (nécessite Playwright avec Chromium). Après un changement, les réseaux gardent l’ancien aperçu en cache : le rafraîchir avec l’outil de débogage de partage de Facebook (developers.facebook.com/tools/debug), qui sert aussi pour Instagram et WhatsApp.
+
 ## Technique
 
 - [Vite](https://vite.dev) — build multi-pages, gabarits partagés injectés au build (`src/partials.js`).

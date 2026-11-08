@@ -3,6 +3,7 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { CATEGORIES, CONTACT, FAQ, OCCASIONS } from './js/config.js';
 import { CREATIONS } from './js/data.js';
+import { OG_PAGES, ogImageUrl, pageUrl } from './og.js';
 
 const svg = (name, attrs = '') =>
   readFileSync(new URL(`../public/brand/${name}.svg`, import.meta.url), 'utf8').replace('<svg ', `<svg ${attrs} `);
@@ -343,6 +344,31 @@ export function seal(variant = 'dark') {
   <svg class="seal__ring" viewBox="0 0 100 100"><defs><path id="${id}" d="M50 50m-38 0a38 38 0 1 1 76 0a38 38 0 1 1-76 0"/></defs><text font-size="9" fill="currentColor" font-family="Tenor Sans, sans-serif" textLength="236" lengthAdjust="spacing"><textPath href="#${id}">FAIT MAIN · SUR COMMANDE ·</textPath></text></svg>
   <div class="seal__mono">${svg('monogram')}</div>
 </div>`;
+}
+
+// Aperçu de partage (Open Graph + X) d'une page : titre, description et image de marque.
+export function og(key) {
+  const p = OG_PAGES[key];
+  if (!p) throw new Error(`Aperçu de partage inconnu : ${key}`);
+  if (!existsSync(new URL(`../public/og/${key}.jpg`, import.meta.url))) throw new Error(`Image de partage manquante : public/og/${key}.jpg (lancer npm run og)`);
+  const tags = [
+    ['property', 'og:type', 'website'],
+    ['property', 'og:site_name', 'L’instant Gourmand'],
+    ['property', 'og:locale', 'fr_FR'],
+    ['property', 'og:url', pageUrl(key)],
+    ['property', 'og:title', p.title],
+    ['property', 'og:description', p.description],
+    ['property', 'og:image', ogImageUrl(key)],
+    ['property', 'og:image:type', 'image/jpeg'],
+    ['property', 'og:image:width', '1200'],
+    ['property', 'og:image:height', '630'],
+    ['property', 'og:image:alt', `${p.heading} — L’instant Gourmand, pâtisserie sur commande`],
+    ['name', 'twitter:card', 'summary_large_image'],
+    ['name', 'twitter:title', p.title],
+    ['name', 'twitter:description', p.description],
+    ['name', 'twitter:image', ogImageUrl(key)],
+  ];
+  return tags.map(([attr, k, v]) => `<meta ${attr}="${k}" content="${esc(v)}" />`).join('\n    ');
 }
 
 export const SVG = { logo: () => svg('logo'), wordmark: () => svg('wordmark'), monogram: () => svg('monogram') };
