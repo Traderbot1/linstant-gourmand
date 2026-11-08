@@ -685,8 +685,8 @@ button {
   color: var(--nude);
 }
 
-/* ───────── Accueil : héros 3D ───────── */
-.webgl {
+/* ───────── Accueil : gâteau (séquence vidéo dans un canvas) ───────── */
+.cake-canvas {
   position: fixed;
   inset: 0;
   width: 100%;
@@ -696,10 +696,7 @@ button {
   pointer-events: none;
 }
 .stage {
-  background:
-    radial-gradient(60% 55% at 50% 58%, #fff8ec 0%, transparent 70%),
-    radial-gradient(120% 80% at 50% 120%, #f1dcc6, transparent 60%),
-    var(--creme);
+  background: #f9e9d5; /* fond de la vidéo du gâteau (cake-sequence.js) */
   color: var(--bordeaux-900);
 }
 .hero {
@@ -886,7 +883,7 @@ button {
   transform-origin: top;
 }
 
-.no-webgl .webgl,
+.no-webgl .cake-canvas,
 .no-webgl .story__labels,
 .no-webgl .story__progress {
   display: none;

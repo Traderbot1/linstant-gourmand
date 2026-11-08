@@ -3,21 +3,21 @@ import { initCommon, gsap, ScrollTrigger, reducedMotion, isTouch, lenis, session
 initCommon();
 
 const mobile = window.matchMedia('(max-width: 760px)').matches;
-const canvas = document.querySelector('.webgl');
+const canvas = document.querySelector('.cake-canvas');
 
-// La 3D (Three.js) est chargée à part, après l'affichage de la page : le texte et le logo
-// s'affichent tout de suite, le gâteau arrive ensuite en douceur.
-let scene = null;
+// Le gâteau est une séquence d'images tirée d'une vraie vidéo : la première image s'affiche
+// tout de suite, les autres se chargent en arrière-plan.
 let cake = null;
-const sceneReady = import('./cake-scene.js')
-  .then((mod) => {
-    cake = mod;
-    scene = mod.createCakeScene(canvas, { reducedMotion, mobile });
-    Object.assign(scene.state, { fade: 1, drop: reducedMotion ? 0 : 1 });
-    if (reducedMotion) scene.state.fade = 0;
+const cakeReady = import('./cake-sequence.js')
+  .then((mod) => mod.createCakeSequence(canvas, { mobile }))
+  .then((c) => {
+    cake = c;
+    // Cadrage du héros : le gâteau sous le logo
+    Object.assign(cake.state, mobile ? { y: -0.04, s: 0.58 } : { y: 0.17, s: 0.74 }, { fade: reducedMotion ? 0 : 1 });
+    cake.draw();
   })
   .catch((err) => {
-    console.warn('WebGL indisponible, affichage simplifié.', err);
+    console.warn('Animation du gâteau indisponible, affichage simplifié.', err);
     document.documentElement.classList.add('no-webgl');
   });
 
@@ -63,87 +63,83 @@ function heroIntro() {
     .from('.scroll-hint', { opacity: 0, duration: 1 }, 1);
 }
 
-// Le gâteau descend se poser sur son plateau
+// Le gâteau apparaît en douceur
 function cakeIntro() {
-  if (!scene || reducedMotion) return;
-  gsap.fromTo(scene.state, { fade: 1, zoom: -0.8, drop: 1 }, { fade: 0, zoom: 0, drop: 0, duration: 2.4, ease: 'expo.out', delay: 0.2 });
+  if (!cake || reducedMotion) return;
+  gsap.fromTo(cake.state, { fade: 1, s: cake.state.s * 0.94 }, { fade: 0, s: cake.state.s, duration: 1.8, ease: 'expo.out', delay: 0.2, onUpdate: cake.draw });
 }
 
-// ─── Histoire 3D pilotée par le scroll ───
+// ─── Histoire pilotée par le scroll : le gâteau tourne, s'ouvre, puis montre ses couches ───
 function initStory() {
   const steps = gsap.utils.toArray('.story__step');
-  if (!scene) return;
-  const { LAYERS, ROT_START, ROT_REVEAL } = cake;
-  const S = scene.state;
-  const xRight = mobile ? 0 : 0.36;
+  if (!cake) return;
+  const S = cake.state;
+  const { rotationEnd, openStart, last } = cake.steps;
 
   const labelsBox = document.querySelector('.story__labels');
-  const labels = LAYERS.map((L, i) => {
-    if (!L.label) return null;
+  const labels = cake.labels.map((L) => {
     const el = document.createElement('div');
-    el.className = 'label3d';
-    el.innerHTML = `<span>${L.label}</span>`;
+    el.className = 'label3d is-center';
+    el.innerHTML = `<span>${L.text}</span>`;
     labelsBox.appendChild(el);
-    return { el, i };
-  }).filter(Boolean);
-  const labelState = { o: 0 };
-
-  gsap.ticker.add(() => {
-    if (labelState.o <= 0.001) {
-      labels.forEach((l) => (l.el.style.opacity = '0'));
-      return;
-    }
-    const narrow = window.innerWidth < 760;
-    labels.forEach((l, k) => {
-      // Sur téléphone : pastille centrée sur la couche (toujours entièrement visible)
-      const p = narrow ? scene.layerAnchor(l.i, 0) : scene.layerAnchor(l.i);
-      const o = gsap.utils.clamp(0, 1, labelState.o * labels.length - (labels.length - 1 - k) * 0.6);
-      l.el.classList.toggle('is-center', narrow);
-      l.el.style.transform = `translate(${narrow ? p.x : p.x + 10}px, ${p.y}px)`;
-      l.el.style.opacity = String(o);
-    });
+    return { el, L };
   });
+  const labelState = { o: 0 };
+  const render = () => {
+    cake.draw();
+    labels.forEach(({ el, L }, k) => {
+      const o = gsap.utils.clamp(0, 1, labelState.o * labels.length - (labels.length - 1 - k) * 0.6);
+      el.style.opacity = String(o);
+      if (o > 0) {
+        // Centrée sur la couche, sans jamais dépasser du bord de l'écran
+        const p = cake.project(L.x, L.y);
+        const half = el.offsetWidth / 2 + 10;
+        const x = gsap.utils.clamp(half, window.innerWidth - half, p.x);
+        el.style.transform = `translate(${x}px, ${p.y}px)`;
+      }
+    });
+  };
 
   const stepIn = () => ({ autoAlpha: 1, y: 0, duration: 0.6, ease: 'power2.out' });
   const stepOut = { autoAlpha: 0, y: -40, duration: 0.5, ease: 'power2.in' };
   gsap.set(steps, { autoAlpha: 0, y: 40 });
 
+  // Cadrages : à droite du texte sur ordinateur, au-dessus du texte sur téléphone
+  const story = mobile ? { x: 0, y: -0.12, s: 0.88 } : { x: 0.22, y: 0.06, s: 0.8 };
+  const opened = mobile ? { x: 0, y: -0.1, s: 0.95 } : { x: 0.24, y: 0.05, s: 0.72 };
+
   const tl = gsap.timeline({
     defaults: { ease: 'power2.inOut' },
-    scrollTrigger: { trigger: '.stage', start: 'top top', end: 'bottom bottom', scrub: 1.2 },
+    onUpdate: render,
+    scrollTrigger: { trigger: '.stage', start: 'top top', end: 'bottom bottom', scrub: 1 },
   });
-  tl.to(S, { topper: 1, duration: 1.4, ease: 'power2.in' }, 0)
-    .to(S, { rot: ROT_REVEAL, duration: 3 }, 0)
-    .to(S, { x: xRight, duration: 2.2 }, 0.8)
-    .to('.hero__logo', { yPercent: -80, opacity: 0, duration: 1.6, ease: 'none' }, 0)
+  tl.to('.hero__logo', { yPercent: -80, opacity: 0, duration: 1.6, ease: 'none' }, 0)
+    .to(S, { ...story, duration: 2 }, 0.4)
+    .to(S, { p: rotationEnd, duration: 3.8, ease: 'none' }, 0)
     .to(steps[0], stepIn(), 1.7)
-    .to(steps[0], stepOut, 3.1)
-    .to(S, { open: 1, zoom: 1, duration: 1.4, ease: 'power2.inOut' }, 3.1)
-    .to(steps[1], stepIn(), 3.6)
-    .to(steps[1], stepOut, 5)
-    .to(S, { explode: 1, x: mobile ? 0 : 0.1, zoom: 0.4, rot: ROT_REVEAL + 0.25, duration: 1.8 }, 5.1)
-    .to(labelState, { o: 1, duration: 1 }, 6.1)
-    .to(steps[2], stepIn(), 5.6)
+    .to(steps[0], stepOut, 3.3)
+    .to(S, { p: openStart, duration: 0.6, ease: 'none' }, 3.8)
+    .to(S, { p: last, duration: 1.8, ease: 'power1.out' }, 4.4)
+    .to(S, { ...opened, duration: 1.8 }, 4.4)
+    .to(steps[1], stepIn(), 3.8)
+    .to(steps[1], stepOut, 5.4)
+    .to(labelState, { o: 1, duration: 1 }, 6)
+    .to(steps[2], stepIn(), 5.8)
     .to(steps[2], stepOut, 7.6)
     .to(labelState, { o: 0, duration: 0.5 }, 7.6)
-    .to(S, { explode: 0, open: 0, topper: 0, zoom: 0, x: xRight, rot: ROT_START + 2 * Math.PI, duration: 1.6 }, 7.8)
-    .to(steps[3], stepIn(), 8.4)
+    .to(steps[3], stepIn(), 8.2)
     .to('.story__progress i', { scaleY: 1, duration: 10, ease: 'none' }, 0)
     .to({}, { duration: 0.6 }, 9.4);
 
+  // Le canvas fixe est masqué une fois l'histoire passée
   ScrollTrigger.create({
     trigger: '.stage',
     start: 'top top',
     end: 'bottom top',
-    onLeave: () => {
-      scene.setRunning(false);
-      canvas.style.visibility = 'hidden';
-    },
-    onEnterBack: () => {
-      scene.setRunning(true);
-      canvas.style.visibility = 'visible';
-    },
+    onLeave: () => (canvas.style.visibility = 'hidden'),
+    onEnterBack: () => (canvas.style.visibility = 'visible'),
   });
+  window.addEventListener('resize', render);
 }
 
 // ─── Vitrine horizontale ───
@@ -218,7 +214,7 @@ initTilt();
 initDraw();
 const loaded = runLoader();
 loaded.then(heroIntro);
-Promise.all([loaded, sceneReady]).then(() => {
+Promise.all([loaded, cakeReady]).then(() => {
   initStory();
   cakeIntro();
   ScrollTrigger.sort();
