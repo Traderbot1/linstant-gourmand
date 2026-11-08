@@ -15,13 +15,6 @@ L’ancienne URL `/atelier/` redirige vers la section « L’atelier » de l’a
 
 1. Pousser ce dépôt sur GitHub, puis sur vercel.com : **Add New → Project → importer le dépôt**. Vercel détecte Vite tout seul (réglages dans `vercel.json`).
 2. Dans le projet Vercel : **Settings → Domains → ajouter `linstantg.com` et `www.linstantg.com`**, puis recopier chez le registrar du domaine les enregistrements DNS indiqués par Vercel.
-3. **Avant de changer les DNS**, récupérer les photos de l’ancien site WordPress (elles disparaîtront ensuite) :
-
-   ```bash
-   npm install
-   npm run photos:wordpress   # télécharge les 15 photos de l’ancien site et les optimise dans public/img/
-   git add public/img && git commit -m "Photos de l’ancien site" && git push
-   ```
 
 ## Lancer le site
 
@@ -44,7 +37,7 @@ Le dossier `dist/` est un site statique : il s’héberge partout (Vercel, Netli
 | Photos | `public/img/` (`nom-800.webp` et `nom-1400.webp`) |
 | Couleurs, typographies | haut de `src/css/main.css` |
 
-**Ajouter une photo** : déposer l’original dans `photos/` en le nommant comme le champ `image` de `src/js/data.js` (ex. `photos/trompe-loeil-cafe.jpg`), puis `npm run photos`. Tant qu’une création n’a pas de photo, elle s’affiche avec le monogramme et « Photos à venir ».
+**Ajouter une photo** : déposer l’original dans `photos/` en le nommant comme le champ `image` de `src/js/data.js` (ex. `photos/trompe-loeil-cafe.jpg`), puis `npm run photos` (ou `npm run photos -- nom-de-la-photo` pour une seule). Le script améliore légèrement la photo (contraste, couleurs, netteté) et **ajoute le logo** en bas : bordeaux sur fond clair, crème sur fond sombre, sur une petite plaque crème si le fond est chargé. Réglages par photo dans `scripts/photos.config.json` : `"logo": "none"` si la photo porte déjà le logo, ou une position (`top`, `bottom-left`, `bottom-right`…). Tant qu’une création n’a pas de photo, elle s’affiche avec le monogramme et « Photos à venir ».
 
 **Ajouter une création** : ajouter une entrée dans `src/js/data.js` (titre, section, étiquette, description, nom de photo ; `featured: true` pour la mettre en avant sur l’accueil). Elle apparaît automatiquement dans la galerie, le formulaire de commande, et — si elle a une photo — dans la vitrine de l’accueil et l’aperçu du menu.
 

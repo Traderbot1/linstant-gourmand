@@ -1631,8 +1631,7 @@ button {
 .card:nth-child(3n + 1) .card__tag {
   left: 50%;
   translate: -50% 0;
-  top: auto;
-  bottom: 16px;
+  top: 22px; /* en haut de l'arche : le bas de la photo porte le logo */
 }
 .card__title {
   font-family: var(--ff-display);
@@ -2625,5 +2624,18 @@ button {
     bottom: auto;
     right: 14px;
     width: 64px;
+  }
+}
+
+/* 7 sections : 4 colonnes sur grand écran */
+@media (min-width: 1200px) {
+  .cats {
+    grid-template-columns: repeat(4, 1fr);
+  }
+  .cats .cat:nth-child(3n + 2) {
+    margin-top: 0;
+  }
+  .cats .cat:nth-child(2n) {
+    margin-top: clamp(0px, 5vw, 80px);
   }
 }

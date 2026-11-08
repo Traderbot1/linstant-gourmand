@@ -30,6 +30,12 @@ export const CATEGORIES = [
     tags: ['Anniversaire', 'Enfants', 'Naissance', 'Amour', 'Fêtes'],
   },
   {
+    id: 'bento',
+    title: 'Bento cakes',
+    short: 'Le petit format qui fait son effet',
+    text: 'De petits gâteaux pour deux à quatre personnes : finition velours, message personnalisé, toute la douceur en format cadeau.',
+  },
+  {
     id: 'trompe-loeil',
     title: 'Trompe-l’œil',
     short: 'Les signatures de la maison',
@@ -38,26 +44,28 @@ export const CATEGORIES = [
   {
     id: 'tunisiennes',
     title: 'Douceurs tunisiennes',
-    short: 'Bourgeois, Naïem, baklavas, Ramadan',
+    short: 'Mignardises, verrines, Ramadan & Aïd',
     text: 'L’héritage tunisien sublimé par la rigueur de la pâtisserie française : pistache, miel d’oranger, croquant et fondant à la fois.',
+    tags: ['Mignardises', 'Ramadan & Aïd', 'Verrines', 'Gâteaux & tartes', 'Coffret'],
   },
   {
     id: 'coffrets',
     title: 'Coffrets',
     short: 'Des écrins à offrir',
-    text: 'Coffrets assortis, éditions saisonnières et compositions sur-mesure, pour offrir ou pour recevoir.',
+    text: 'Écrins sucrés aux couleurs de la maison et box salées prêtes à partager : pour offrir ou pour recevoir.',
   },
   {
     id: 'sale',
     title: 'Salé',
     short: 'Fricassés, wraps & burgers',
-    text: 'Fricassés au thon, mini wraps, burgers gourmets : une généreuse parenthèse méditerranéenne pour vos brunchs, apéritifs et événements.',
+    text: 'Fricassés, wraps, mini burgers, plateaux et buffets : une généreuse parenthèse méditerranéenne pour vos brunchs, apéritifs et événements.',
+    tags: ['Plateaux', 'Buffets', 'Box & coffrets', 'Apéritif'],
   },
   {
     id: 'jus',
     title: 'Jus',
-    short: 'Jus maison',
-    text: 'Des jus maison pour accompagner vos tables de fête, brunchs et événements.',
+    short: 'Jus & smoothies maison',
+    text: 'Jus et smoothies maison, en carafe ou au verre, pour accompagner vos tables de fête, brunchs et événements.',
   },
 ];
 

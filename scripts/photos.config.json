@@ -1,0 +1,31 @@
+{
+  "photos": {
+    "coffret-bordeaux": {
+      "logo": "none"
+    },
+    "coffret-blanc": {
+      "logo": "none"
+    },
+    "coffret-prestige": {
+      "logo": "none"
+    },
+    "coffret-signature": {
+      "logo": "none"
+    },
+    "tunis-baklava-pistache": {
+      "logo": "none"
+    },
+    "bento-couronne-perles": {
+      "logo": "top"
+    },
+    "gateau-love-ourson": {
+      "logo": "bottom-right"
+    },
+    "gateau-super-heros": {
+      "logo": "bottom-left"
+    },
+    "gateau-i-love-you": {
+      "logo": "bottom-right"
+    }
+  }
+}

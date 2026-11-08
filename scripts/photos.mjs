@@ -1,10 +1,12 @@
 // Prépare les photos pour le site : public/img/<nom>-800.webp et <nom>-1400.webp.
 //
-//   npm run photos              → convertit tout ce qui est dans photos/ (le nom du fichier = le nom de la photo)
-//   npm run photos:wordpress    → télécharge d'abord les photos de l'ancien site WordPress, puis convertit
-//                                 (à lancer AVANT de faire pointer linstantg.com vers Vercel)
-//   npm run photos:wordpress -- --from https://autre-adresse.com   → autre adresse pour l'ancien site
-import { mkdir, readdir, writeFile } from 'node:fs/promises';
+//   npm run photos              → traite tout ce qui est dans photos/ (le nom du fichier = le nom de la photo)
+//   npm run photos -- nom1 nom2 → ne traite que ces photos
+//
+// Pour chaque photo : légère mise en valeur (contraste, couleurs, netteté), puis ajout du logo
+// L'instant Gourmand en bas de l'image — en bordeaux sur fond clair, en crème sur fond sombre.
+// Réglages par photo (logo déjà présent, position du logo) : scripts/photos.config.json
+import { mkdir, readdir, readFile } from 'node:fs/promises';
 import { extname, basename, join } from 'node:path';
 import sharp from 'sharp';
 
@@ -13,50 +15,70 @@ const SRC = join(ROOT, 'photos');
 const OUT = join(ROOT, 'public/img');
 const SIZES = [800, 1400];
 
-// Nom de la photo sur le site  ←  fichier sur l'ancien site WordPress
-const WORDPRESS = {
-  'trompe-loeil-cacahuete': '2026/04/trompe-l-oeil-cachauette.jpg',
-  'trompe-loeil-cafe': '2026/04/trompe-l-oeil-cafe.jpg',
-  'gateau-pistache-ramadan': '2026/04/gateau-pistache-ramadan.jpg',
-  'gateau-rose-naiem': '2026/04/gateau-rose-asma.jpg',
-  'gateau-bourgeois': '2026/04/gateau-bassem.jpg',
-  'baklava-pistache': '2026/04/baklava-pistache-l-instant-gourmand.jpg',
-  'coffret-bordeaux-4': '2026/04/packet-l-instant-gourmand-rouge-bordeaux-4-assortissement.jpg',
-  'coffret-decouverte-7': '2026/04/packet-l-instant-gourmand-7-assortissement.jpg',
-  'coffret-luxe-pistache-pignon': '2026/04/packet-luxe-pistache-pignon.jpg',
-  'coffret-trio-eid': '2026/04/3-packet-eid-moubarak-pistache-et-pignon.jpg',
-  'coffret-blanc-biscuits': '2026/04/packet-blanc-1-assortissement-biscuit-artisanale.jpg',
-  'composition-sur-mesure': '2026/04/4-packets-l-instant-gourmand-avec-2-gateaux.jpg',
-  'fricasse-thon': '2026/04/packet-friccasse-thon.jpg',
-  'mini-wrap-poulet': '2026/04/packet-mini-vrap-poulet.jpg',
-};
+const config = JSON.parse(await readFile(join(ROOT, 'scripts/photos.config.json'), 'utf8'));
+const logoSvg = await readFile(join(ROOT, 'public/brand/logo-ig.svg'), 'utf8');
+const [, , vbW, vbH] = logoSvg.match(/viewBox="([^"]+)"/)[1].split(/\s+/).map(Number);
+const logoPath = logoSvg.match(/<path d="([^"]+)"/)[1];
 
-const args = process.argv.slice(2);
-await mkdir(SRC, { recursive: true });
-await mkdir(OUT, { recursive: true });
-
-if (args.includes('--wordpress')) {
-  const i = args.indexOf('--from');
-  const base = (i >= 0 ? args[i + 1] : 'https://linstantg.com').replace(/\/$/, '');
-  for (const [name, path] of Object.entries(WORDPRESS)) {
-    const url = `${base}/wp-content/uploads/${path}`;
-    try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      await writeFile(join(SRC, `${name}${extname(path)}`), Buffer.from(await res.arrayBuffer()));
-      console.log(`↓ ${name}`);
-    } catch (err) {
-      console.warn(`✗ ${name} — ${url} (${err.message})`);
-    }
-  }
+// Logo vectoriel rendu à la taille voulue : ombre douce pour la version crème,
+// ou petite plaque crème arrondie (comme une étiquette) quand le fond est trop chargé.
+function logoOverlay(width, color, shadow, plate) {
+  const height = Math.round((width * vbH) / vbW);
+  const pad = Math.round(width * (plate ? 0.07 : 0.04));
+  const filter = shadow
+    ? `<filter id="s" x="-10%" y="-40%" width="120%" height="180%"><feGaussianBlur in="SourceAlpha" stdDeviation="${(vbW / width) * 3}"/><feOffset dy="${(vbW / width) * 1}"/><feComponentTransfer><feFuncA type="linear" slope="0.45"/></feComponentTransfer><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>`
+    : '';
+  const u = vbW / width; // unités du logo par pixel
+  const plateRect = plate
+    ? `<rect x="${-pad * u * 0.9}" y="${-pad * u * 0.9}" width="${vbW + pad * u * 1.8}" height="${vbH + pad * u * 1.8}" rx="${pad * u * 1.6}" fill="#FBEFDC" fill-opacity="0.86"/>`
+    : '';
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width + pad * 2}" height="${height + pad * 2}" viewBox="${-pad * u} ${-pad * u} ${vbW + 2 * pad * u} ${vbH + 2 * pad * u}">${filter}${plateRect}<path d="${logoPath}" fill="${color}" fill-rule="evenodd" ${shadow ? 'filter="url(#s)"' : ''} fill-opacity="${shadow ? 0.96 : 0.92}"/></svg>`;
+  return { input: Buffer.from(svg), width: width + pad * 2, height: height + pad * 2 };
 }
 
+async function render(file, name, w) {
+  const opts = config.photos?.[name] ?? {};
+  let img = sharp(join(SRC, file)).rotate().resize({ width: w, withoutEnlargement: true });
+  if (opts.enhance !== false) {
+    img = img
+      .modulate({ saturation: 1.06, brightness: 1.01 })
+      .linear(1.05, -6)
+      .sharpen({ sigma: 0.6 });
+  }
+  const base = await img.toBuffer({ resolveWithObject: true });
+  const { width, height } = base.info;
+  const pipeline = sharp(base.data);
+  const position = opts.logo ?? 'bottom';
+  if (position === 'none') return pipeline;
+
+  const landscape = width > height;
+  const logoW = Math.round(width * (opts.logoScale ?? (landscape ? 0.28 : 0.38)));
+  const logoH = Math.round((logoW * vbH) / vbW);
+  const margin = Math.round(height * 0.035);
+  const side = Math.round(width * 0.05);
+  const left = position.endsWith('right') ? width - logoW - side : position.endsWith('left') ? side : Math.round((width - logoW) / 2);
+  const top = position.startsWith('top') ? margin : height - logoH - margin;
+
+  // Couleur selon la luminosité du fond à l'endroit du logo
+  const { channels } = await sharp(base.data).extract({ left, top, width: logoW, height: logoH }).stats();
+  const lum = 0.2126 * channels[0].mean + 0.7152 * channels[1].mean + 0.0722 * channels[2].mean;
+  const busy = opts.plate ?? (channels[0].stdev + channels[1].stdev + channels[2].stdev) / 3 > 38;
+  const dark = !busy && (opts.logoColor ? opts.logoColor === 'creme' : lum < 150);
+  const ov = logoOverlay(logoW, dark ? '#FBEFDC' : '#4C1212', dark, busy);
+  const pad = (ov.width - logoW) / 2;
+  return pipeline.composite([{ input: ov.input, left: Math.max(0, Math.round(left - pad)), top: Math.max(0, Math.round(top - pad)) }]);
+}
+
+await mkdir(OUT, { recursive: true });
+const only = process.argv.slice(2);
 const files = (await readdir(SRC)).filter((f) => /\.(jpe?g|png|webp|avif|tiff?)$/i.test(f));
 if (!files.length) console.log('Aucune photo dans photos/.');
 for (const file of files) {
   const name = basename(file, extname(file)).toLowerCase().replace(/[^a-z0-9-]+/g, '-');
+  if (only.length && !only.includes(name)) continue;
   for (const w of SIZES) {
-    await sharp(join(SRC, file)).rotate().resize({ width: w, withoutEnlargement: true }).webp({ quality: 82 }).toFile(join(OUT, `${name}-${w}.webp`));
+    const out = await render(file, name, w);
+    await out.webp({ quality: 82 }).toFile(join(OUT, `${name}-${w}.webp`));
   }
   console.log(`✓ public/img/${name}-{800,1400}.webp`);
 }

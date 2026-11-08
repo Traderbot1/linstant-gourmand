@@ -38,12 +38,14 @@ export function img(name, alt, sizes = '(max-width: 760px) 90vw, 33vw', extra = 
 const monoTile = (soon = false) => `<div class="mono-tile${soon ? ' mono-tile--soon' : ''}" aria-hidden="true">${svg('monogram')}</div>`;
 const media = (c, sizes) => (hasImage(c.image) ? img(c.image, c.title, sizes) : monoTile(true));
 const withImages = () => CREATIONS.filter((c) => hasImage(c.image));
+// Une création s'affiche dans sa section et dans celles listées dans `also`.
+const inSection = (c, id) => c.category === id || c.also?.includes(id);
 const coverOf = (catId) => {
-  const list = withImages().filter((c) => c.category === catId);
+  const list = withImages().filter((c) => inSection(c, catId));
   return list.find((c) => c.featured) ?? list[0];
 };
 const slug = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-');
-const countOf = (catId) => CREATIONS.filter((c) => c.category === catId).length;
+const countOf = (catId) => CREATIONS.filter((c) => inSection(c, catId)).length;
 
 export function header() {
   const items = CATEGORIES.map(
@@ -187,9 +189,21 @@ export function homeCats() {
   }).join('');
 }
 
-export function showcase() {
+// Vitrine de l'accueil : les 2 premiers gâteaux mis en avant, puis le meilleur de chaque section,
+// puis d'autres gâteaux mis en avant (10 pièces au total).
+function showcaseList() {
   const featured = withImages().filter((c) => c.featured);
-  const slides = (featured.length ? featured : withImages())
+  const picks = featured.filter((c) => c.category === 'gateaux').slice(0, 2);
+  for (const cat of CATEGORIES) {
+    const best = featured.find((c) => c.category === cat.id && !picks.includes(c));
+    if (best && cat.id !== 'gateaux') picks.push(best);
+  }
+  for (const c of featured) if (picks.length < 10 && !picks.includes(c)) picks.push(c);
+  return picks;
+}
+
+export function showcase() {
+  const slides = showcaseList()
     .map(
       (c, i) => `<article class="slide" data-cursor="Voir">
   <span class="slide__index" aria-hidden="true">${pad(i + 1)}</span>
@@ -217,7 +231,7 @@ export function sectionNav(id) {
 export function tagFilters(id) {
   const cat = catOf(id);
   if (!cat?.tags) return '';
-  const n = (t) => CREATIONS.filter((c) => c.category === id && c.tag === t).length;
+  const n = (t) => CREATIONS.filter((c) => inSection(c, id) && c.tag === t).length;
   return (
     `<button class="filter" type="button" data-filter="all" aria-pressed="true">Tout<sup>${countOf(id)}</sup></button>` +
     cat.tags.map((t) => `<button class="filter" type="button" data-filter="${slug(t)}" aria-pressed="false">${t}<sup>${n(t)}</sup></button>`).join('')
@@ -232,7 +246,7 @@ export function sectionText(id) {
 }
 
 export function gallery(id) {
-  const list = CREATIONS.filter((c) => c.category === id);
+  const list = CREATIONS.filter((c) => inSection(c, id));
   if (!list.length) {
     const cat = catOf(id);
     return `<div class="card card--soon">
