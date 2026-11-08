@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { defineConfig } from 'vite';
 import * as P from './src/partials.js';
@@ -22,12 +22,18 @@ const sectionPages = () => {
 // Remplace les marqueurs <!--@nom--> ou <!--@nom:argument--> par les gabarits de src/partials.js.
 const partials = () => ({
   name: 'partials',
-  transformIndexHtml(html) {
-    return html.replace(/<!--@(\w+)(?::([\w-]+))?-->/g, (m, name, arg) => {
+  transformIndexHtml(html, ctx) {
+    const out = html.replace(/<!--@(\w+)(?::([\w-]+))?-->/g, (m, name, arg) => {
       if (typeof P[name] === 'function') return P[name](arg);
       if (P.SVG[name]) return P.SVG[name]();
       throw new Error(`Gabarit inconnu : ${name}`);
     });
+    // Garde-fou : une photo citée mais absente de public/img fait échouer le build
+    const missing = [...new Set([...out.matchAll(/\/img\/([\w.-]+\.(?:webp|jpg|png))/g)].map((m) => m[1]))].filter(
+      (f) => !existsSync(resolve(root, 'public/img', f)),
+    );
+    if (missing.length) throw new Error(`Photo(s) introuvable(s) dans ${ctx.filename} : ${missing.join(', ')}`);
+    return out;
   },
   handleHotUpdate({ file, server }) {
     if (/\/src\/(partials\.js|js\/config\.js|js\/data\.js|templates\/)/.test(file)) server.restart();

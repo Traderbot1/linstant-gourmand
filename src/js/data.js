@@ -88,7 +88,6 @@ export const CREATIONS = [
   // Coffrets (visibles aussi dans « Douceurs tunisiennes »)
   { id: 'coffret-bordeaux', title: 'Coffret Bordeaux', category: 'coffrets', tag: 'Coffret', description: 'Le coffret signature aux couleurs de la maison : douze douceurs assorties.', image: 'coffret-bordeaux', featured: true, also: ['tunisiennes'] },
   { id: 'coffret-prestige', title: 'Coffret Prestige', category: 'coffrets', tag: 'Coffret', description: 'Seize pièces : chocolat, amande, pistache et madeleines dorées.', image: 'coffret-prestige', also: ['tunisiennes'] },
-  { id: 'coffret-signature', title: 'Coffret Signature', category: 'coffrets', tag: 'Coffret', description: 'Écrin bordeaux garni de seize douceurs pralinées et fruitées.', image: 'coffret-signature', also: ['tunisiennes'] },
   { id: 'coffret-rose', title: 'Coffret Rose', category: 'coffrets', tag: 'Coffret', description: 'Neuf mignardises pistache, amande et chocolat dans un écrin rose.', image: 'coffret-rose', also: ['tunisiennes'] },
   { id: 'coffret-blanc', title: 'Coffret Blanc', category: 'coffrets', tag: 'Coffret', description: 'Un écrin blanc garni de biscuits artisanaux.', image: 'coffret-blanc', also: ['tunisiennes'] },
 
@@ -112,7 +111,7 @@ export const CREATIONS = [
   { id: 'carres-aperitifs', title: 'Carrés apéritifs', category: 'sale', tag: 'Apéritif', description: 'Petites bouchées piquées, présentées sur plateau doré.', image: 'sale-carres-aperitifs' },
 
   // Jus
-  { id: 'jus-rubis', title: 'Rubis', category: 'jus', tag: 'Jus', description: 'Un jus aux reflets rubis, servi en carafe ou au verre.', image: 'jus-rubis', featured: true },
-  { id: 'jus-soleil', title: 'Soleil', category: 'jus', tag: 'Jus', description: 'Un jus doré et frais, servi en carafe ou au verre.', image: 'jus-soleil' },
-  { id: 'jus-orange-banane', title: 'Orange-banane', category: 'jus', tag: 'Smoothie', description: 'Orange pressée et banane, servi bien frais.', image: 'jus-orange-banane' },
+  { id: 'jus-rubis', title: 'Jus de fraise', category: 'jus', tag: 'Jus', description: 'Fraises pressées, servi frais en carafe ou au verre.', image: 'jus-rubis', featured: true },
+  { id: 'jus-soleil', title: 'Jus d’orange', category: 'jus', tag: 'Jus', description: 'Oranges pressées, servi frais en carafe ou au verre.', image: 'jus-soleil' },
+  { id: 'jus-orange-banane', title: 'Smoothie orange-banane', category: 'jus', tag: 'Smoothie', description: 'Orange pressée et banane, servi bien frais.', image: 'jus-orange-banane' },
 ];
