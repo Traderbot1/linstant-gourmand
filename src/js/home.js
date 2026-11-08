@@ -13,7 +13,7 @@ const cakeReady = import('./cake-sequence.js')
   .then((c) => {
     cake = c;
     // Cadrage du héros : le gâteau sous le logo
-    Object.assign(cake.state, mobile ? { y: -0.04, s: 0.58 } : { y: 0.17, s: 0.74 }, { fade: reducedMotion ? 0 : 1 });
+    Object.assign(cake.state, mobile ? { y: -0.03, s: 1.45 } : { y: 0.17, s: 0.74 }, { fade: reducedMotion ? 0 : 1 });
     cake.draw();
   })
   .catch((err) => {
@@ -105,8 +105,8 @@ function initStory() {
   gsap.set(steps, { autoAlpha: 0, y: 40 });
 
   // Cadrages : à droite du texte sur ordinateur, au-dessus du texte sur téléphone
-  const story = mobile ? { x: 0, y: -0.12, s: 0.88 } : { x: 0.22, y: 0.06, s: 0.8 };
-  const opened = mobile ? { x: 0, y: -0.1, s: 0.95 } : { x: 0.24, y: 0.05, s: 0.72 };
+  const story = mobile ? { x: 0, y: -0.2, s: 1.9 } : { x: 0.22, y: 0.06, s: 0.8 };
+  const opened = mobile ? { x: 0, y: -0.16, s: 1.32 } : { x: 0.24, y: 0.05, s: 0.72 };
 
   const tl = gsap.timeline({
     defaults: { ease: 'power2.inOut' },

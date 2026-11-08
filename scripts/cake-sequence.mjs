@@ -2,7 +2,7 @@
 //
 //   npm run sequence
 //
-// Entrée : kie/videos/{rotation,ouverture}-{16x9,9x16}.mp4 (non versionnées)
+// Entrée : kie/videos/{rotation,ouverture}-16x9.mp4 (non versionnées)
 // Sortie : public/sequence/{desktop,mobile}/NNN.webp + public/sequence/manifest.json
 //
 // La séquence = la rotation en aller-retour (le gâteau pivote puis revient face à la caméra,
@@ -34,16 +34,19 @@ const SETS = {
       { text: 'Crème & éclats de pistache', x: 0.645, y: 0.52 },
     ],
   },
+  // Téléphone : les mêmes vidéos 16:9 (le gâteau y est entouré de fond, ce qui permet de fondre
+  // les bords de l'image dans la page sans voiler le gâteau), en plus léger, cadrées en largeur.
   mobile: {
-    width: 720,
+    width: 1100,
     quality: 68,
-    rotation: { file: 'rotation-9x16.mp4', from: 0, to: 96, step: 2, pingpong: true },
-    opening: { file: 'ouverture-9x16.mp4', from: 66, to: 187, step: 2 },
+    fit: 'width',
+    rotation: { file: 'rotation-16x9.mp4', from: 0, to: 96, step: 2, pingpong: true },
+    opening: { file: 'ouverture-16x9.mp4', from: 108, to: 187, step: 2 },
     fade: 10,
     labels: [
-      { text: 'Génoise moelleuse', x: 0.76, y: 0.33 },
-      { text: 'Crème légère', x: 0.76, y: 0.39 },
-      { text: 'Crème & éclats de pistache', x: 0.76, y: 0.515 },
+      { text: 'Génoise moelleuse', x: 0.645, y: 0.3 },
+      { text: 'Crème légère', x: 0.645, y: 0.385 },
+      { text: 'Crème & éclats de pistache', x: 0.645, y: 0.52 },
     ],
   },
 };
@@ -95,7 +98,7 @@ try {
       bytes += info.size;
       if (index === 0) Object.assign(set, { w: info.width, h: info.height });
     }
-    manifest[name] = { files: keys.size, order, rotationEnd: rot.length - 1, openStart, width: set.w, height: set.h, labels: set.labels };
+    manifest[name] = { files: keys.size, order, rotationEnd: rot.length - 1, openStart, width: set.w, height: set.h, fit: set.fit ?? 'cover', labels: set.labels };
     console.log(`✓ ${name} : ${frames.length} pas, ${keys.size} images, ${(bytes / 1e6).toFixed(1)} Mo`);
   }
 } finally {

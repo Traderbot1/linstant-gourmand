@@ -44,7 +44,7 @@ Le dossier `dist/` est un site statique : il s’héberge partout (Vercel, Netli
 ## Technique
 
 - [Vite](https://vite.dev) — build multi-pages, gabarits partagés injectés au build (`src/partials.js`).
-- Gâteau de l’accueil : vidéos générées avec Kie.ai (Veo 3.1) à partir de la vraie photo, découpées en images WebP par `npm run sequence` (`scripts/cake-sequence.mjs`, nécessite ffmpeg) et dessinées dans un canvas au scroll (`src/js/cake-sequence.js`). Pour changer de vidéo : déposer `rotation-16x9.mp4`, `ouverture-16x9.mp4`, `rotation-9x16.mp4`, `ouverture-9x16.mp4` dans `kie/videos/`, ajuster les plages d’images en haut du script, puis `npm run sequence`.
+- Gâteau de l’accueil : vidéos générées avec Kie.ai (Veo 3.1) à partir de la vraie photo, découpées en images WebP par `npm run sequence` (`scripts/cake-sequence.mjs`, nécessite ffmpeg) et dessinées dans un canvas au scroll (`src/js/cake-sequence.js`). Pour changer de vidéo : déposer `rotation-16x9.mp4` et `ouverture-16x9.mp4` dans `kie/videos/` (le téléphone utilise aussi le 16:9), ajuster les plages d’images en haut du script, puis `npm run sequence`.
 - [GSAP](https://gsap.com) + ScrollTrigger, SplitText, Flip — animations pilotées par le scroll.
 - [Lenis](https://lenis.darkroom.engineering) — défilement doux.
 - Accessibilité : navigation clavier, `prefers-reduced-motion` respecté, repli image si WebGL est indisponible.

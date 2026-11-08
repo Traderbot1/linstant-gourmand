@@ -154,6 +154,7 @@
     "openStart": 107,
     "width": 1600,
     "height": 900,
+    "fit": "cover",
     "labels": [
       {
         "text": "Génoise moelleuse",
@@ -173,7 +174,7 @@
     ]
   },
   "mobile": {
-    "files": 120,
+    "files": 99,
     "order": [
       0,
       1,
@@ -321,48 +322,28 @@
       95,
       96,
       97,
-      98,
-      99,
-      100,
-      101,
-      102,
-      103,
-      104,
-      105,
-      106,
-      107,
-      108,
-      109,
-      110,
-      111,
-      112,
-      113,
-      114,
-      115,
-      116,
-      117,
-      118,
-      119
+      98
     ],
     "rotationEnd": 96,
     "openStart": 107,
-    "width": 720,
-    "height": 1280,
+    "width": 1100,
+    "height": 618,
+    "fit": "width",
     "labels": [
       {
         "text": "Génoise moelleuse",
-        "x": 0.76,
-        "y": 0.33
+        "x": 0.645,
+        "y": 0.3
       },
       {
         "text": "Crème légère",
-        "x": 0.76,
-        "y": 0.39
+        "x": 0.645,
+        "y": 0.385
       },
       {
         "text": "Crème & éclats de pistache",
-        "x": 0.76,
-        "y": 0.515
+        "x": 0.645,
+        "y": 0.52
       }
     ]
   }

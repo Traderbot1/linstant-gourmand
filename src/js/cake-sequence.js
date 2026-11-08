@@ -1,7 +1,7 @@
 // Le gâteau de l'accueil : une séquence d'images tirée d'une vraie vidéo (scripts/cake-sequence.mjs),
 // dessinée dans un canvas et pilotée par le scroll depuis home.js.
 // state.p = position dans la séquence (fractionnaire : deux images voisines sont fondues),
-// state.x / state.y / state.s = cadrage (décalage en fraction de l'écran, échelle).
+// state.x / state.y / state.s = cadrage (décalage en fraction de l'écran, échelle, voir rect()).
 
 const BG = '#f9e9d5'; // fond de la vidéo, repris par la page (.stage)
 
@@ -52,7 +52,9 @@ export async function createCakeSequence(canvas, { mobile = false } = {}) {
 
   // Rectangle de l'image à l'écran (en px CSS)
   function rect() {
-    const scale = Math.max(W / set.width, H / set.height) * state.s;
+    // « cover » : l'image couvre l'écran à s = 1 ; « width » : l'image fait la largeur de l'écran à s = 1
+    const base = set.fit === 'width' ? W / set.width : Math.max(W / set.width, H / set.height);
+    const scale = base * state.s;
     const rw = set.width * scale;
     const rh = set.height * scale;
     return { cx: W / 2 + state.x * W, cy: H / 2 + state.y * H, rw, rh };
